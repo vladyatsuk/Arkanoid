@@ -38,3 +38,15 @@ let drawRectangle = function (obj) {
 const clearCanvas = function () {
   canvas.width = canvas.width;
 };
+
+let prevTime = 0;
+const moveBall = function (currTime = 0) {
+  requestAnimationFrame(moveBall);
+  clearCanvas();
+  drawRectangle(ball);
+  let deltaInSeconds = (currTime - prevTime) / 1000;
+  prevTime = currTime;
+  ball.x += deltaInSeconds * ball.speed;
+  ball.y -= deltaInSeconds * ball.speed;
+};
+moveBall(0);
