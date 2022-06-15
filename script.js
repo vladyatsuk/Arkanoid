@@ -86,4 +86,11 @@ function isIntersection(blockA, blockB) {
   }
 }
 
+const borders = [
+  { x: 0, y: -10, width: canvas.width, height: 10 },
+  { x: canvas.width, y: 0, width: 10, height: canvas.height },
+  { x: 0, y: canvas.height, width: canvas.width, height: 5 },
+  { x: -10, y: 0, width: 10, height: canvas.height },
+];
+
 moveBall(0);
