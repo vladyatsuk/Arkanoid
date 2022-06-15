@@ -18,7 +18,7 @@ const ball = {
   width: 10,
   height: 10,
   speed: 50,
-  angle: Math.Pi / 4 + (Math.random() * Math.Pi) / 2,
+  angle: Math.PI / 4 + (Math.random() * Math.PI) / 2,
 };
 
 const blocks = [
@@ -33,4 +33,8 @@ let drawRectangle = function (obj) {
   context.rect(obj.x, obj.y, obj.width, obj.height);
   context.strokeStyle = 'green';
   context.stroke();
+};
+
+const clearCanvas = function () {
+  canvas.width = canvas.width;
 };
