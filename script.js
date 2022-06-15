@@ -40,14 +40,20 @@ const clearCanvas = function () {
 };
 
 let prevTime = 0;
-const moveBall = function (currTime = 0) {
+const moveBall = function (currTime) {
   requestAnimationFrame(moveBall);
   clearCanvas();
   drawRectangle(ball);
   let deltaInSeconds = (currTime - prevTime) / 1000;
   prevTime = currTime;
-  ball.x += deltaInSeconds * ball.speed;
-  ball.y -= deltaInSeconds * ball.speed;
+  ball.x += deltaInSeconds * ball.speed * Math.cos(ball.angle);
+  ball.y -= deltaInSeconds * ball.speed * Math.sin(ball.angle);
+  if (isIntersection(borders[0], ball) || isIntersection(borders[2], ball)) {
+    ball.angle = 2 * Math.PI - ball.angle;
+  }
+  if (isIntersection(borders[1], ball) || isIntersection(borders[3], ball)) {
+    ball.angle = Math.PI - ball.angle;
+  }
 };
 
 function isIntersection(blockA, blockB) {
