@@ -28,6 +28,13 @@ const blocks = [
   { x: 200, y: 50, width: 50, height: 10 },
 ];
 
+const borders = [
+  { x: 0, y: -10, width: canvas.width, height: 10 },
+  { x: canvas.width, y: 0, width: 10, height: canvas.height },
+  { x: 0, y: canvas.height, width: canvas.width, height: 5 },
+  { x: -10, y: 0, width: 10, height: canvas.height },
+];
+
 let drawRectangle = function (obj) {
   context.beginPath();
   context.rect(obj.x, obj.y, obj.width, obj.height);
@@ -37,23 +44,6 @@ let drawRectangle = function (obj) {
 
 const clearCanvas = function () {
   canvas.width = canvas.width;
-};
-
-let prevTime = 0;
-const moveBall = function (currTime) {
-  requestAnimationFrame(moveBall);
-  clearCanvas();
-  drawRectangle(ball);
-  let deltaInSeconds = (currTime - prevTime) / 1000;
-  prevTime = currTime;
-  ball.x += deltaInSeconds * ball.speed * Math.cos(ball.angle);
-  ball.y -= deltaInSeconds * ball.speed * Math.sin(ball.angle);
-  if (isIntersection(borders[0], ball) || isIntersection(borders[2], ball)) {
-    ball.angle = 2 * Math.PI - ball.angle;
-  }
-  if (isIntersection(borders[1], ball) || isIntersection(borders[3], ball)) {
-    ball.angle = Math.PI - ball.angle;
-  }
 };
 
 function isIntersection(blockA, blockB) {
@@ -92,11 +82,21 @@ function isIntersection(blockA, blockB) {
   }
 }
 
-const borders = [
-  { x: 0, y: -10, width: canvas.width, height: 10 },
-  { x: canvas.width, y: 0, width: 10, height: canvas.height },
-  { x: 0, y: canvas.height, width: canvas.width, height: 5 },
-  { x: -10, y: 0, width: 10, height: canvas.height },
-];
+let prevTime = 0;
+const moveBall = function (currTime) {
+  requestAnimationFrame(moveBall);
+  clearCanvas();
+  drawRectangle(ball);
+  let deltaInSeconds = (currTime - prevTime) / 1000;
+  prevTime = currTime;
+  ball.x += deltaInSeconds * ball.speed * Math.cos(ball.angle);
+  ball.y -= deltaInSeconds * ball.speed * Math.sin(ball.angle);
+  if (isIntersection(borders[0], ball) || isIntersection(borders[2], ball)) {
+    ball.angle = 2 * Math.PI - ball.angle;
+  }
+  if (isIntersection(borders[1], ball) || isIntersection(borders[3], ball)) {
+    ball.angle = Math.PI - ball.angle;
+  }
+};
 
 moveBall(0);
