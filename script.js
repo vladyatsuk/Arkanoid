@@ -17,7 +17,7 @@ const ball = {
   y: canvas.width / 2,
   width: 10,
   height: 10,
-  speed: 50,
+  speed: 400,
   angle: Math.PI / 4 + (Math.random() * Math.PI) / 2,
 };
 
@@ -101,7 +101,7 @@ const moveBall = function (currTime) {
   ball.x += deltaInSeconds * ball.speed * Math.cos(ball.angle);
   ball.y -= deltaInSeconds * ball.speed * Math.sin(ball.angle);
   for(const block of blocks){
-    if(isIntersection(block, ball)) 
+    if(isIntersection(block, ball)){
     toggleItem(blocks, block);
     const topHitbox ={
       x: block.x - 10,
@@ -127,6 +127,13 @@ const moveBall = function (currTime) {
       width: 10,
       height: block.height + 10
     };
+    if(isIntersection(topHitbox, ball) || isIntersection(bottomHitbox, ball)){
+      ball.angle = 2 * Math.PI - ball.angle;
+    }
+    if(isIntersection(rightHitbox, ball) || isIntersection(leftHitbox, ball)){
+      ball.angle = Math.PI - ball.angle;
+    }
+  }
   }
   if (isIntersection(borders[0], ball) || isIntersection(borders[2], ball)) {
     ball.angle = 2 * Math.PI - ball.angle;
