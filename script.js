@@ -82,6 +82,16 @@ function isIntersection(blockA, blockB) {
   }
 }
 
+function toggleItem(array, item){
+  if (array.includes(item)){
+    const index = array.indexOf(item);
+    array.splice(index, 1);
+  }
+  else{
+    array.push(item);
+  }
+}
+
 let prevTime = 0;
 const moveBall = function (currTime) {
   requestAnimationFrame(moveBall);
@@ -91,6 +101,7 @@ const moveBall = function (currTime) {
   prevTime = currTime;
   ball.x += deltaInSeconds * ball.speed * Math.cos(ball.angle);
   ball.y -= deltaInSeconds * ball.speed * Math.sin(ball.angle);
+
   if (isIntersection(borders[0], ball) || isIntersection(borders[2], ball)) {
     ball.angle = 2 * Math.PI - ball.angle;
   }
