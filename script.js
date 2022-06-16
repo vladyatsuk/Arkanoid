@@ -101,7 +101,32 @@ const moveBall = function (currTime) {
   ball.x += deltaInSeconds * ball.speed * Math.cos(ball.angle);
   ball.y -= deltaInSeconds * ball.speed * Math.sin(ball.angle);
   for(const block of blocks){
-    if(isIntersection(block, ball)) toggleItem(blocks, block);
+    if(isIntersection(block, ball)) 
+    toggleItem(blocks, block);
+    const topHitbox ={
+      x: block.x - 10,
+      y: block.y - 10,
+      width: 10 + block.width,
+      height: 10
+    };
+    const rightHitbox={
+      x: block.x + block.width,
+      y: block.y - 10,
+      width: 10,
+      height: 10 + block.height
+    };
+    const bottomHitbox={
+      x: block.x,
+      y: block.y + block.height,
+      width: block.width + 10,
+      height: 10
+    };
+    const leftHitbox={
+      x: block.x - 10,
+      y: block.y,
+      width: 10,
+      height: block.height + 10
+    };
   }
   if (isIntersection(borders[0], ball) || isIntersection(borders[2], ball)) {
     ball.angle = 2 * Math.PI - ball.angle;
