@@ -10,7 +10,9 @@ const player = {
   y: canvas.height - 40,
   width: 150,
   height: 20,
-  speed: 15,
+  speed: 200,
+  leftKey: false,
+  rightKey: false
 };
 const ball = {
   x: canvas.width / 2,
@@ -92,6 +94,22 @@ function toggleItem(array, item){
   }
 }
 
+document.addEventListener("keydown", function(event){
+  if(event.key === "ArrowLeft"){
+    player.leftKey = true;
+  }
+  else if(event.key === "ArrowRight"){
+    player.rightKey = true;
+  }
+})
+document.addEventListener("keyup", function(event){
+  if(event.key === "ArrowLeft"){
+    player.leftKey = false;
+  }
+  else if(event.key === "ArrowRight"){
+    player.rightKey = false;
+  }
+})
 let prevTime = 0;
 const moveBall = function (currTime) {
   requestAnimationFrame(moveBall);
@@ -100,6 +118,12 @@ const moveBall = function (currTime) {
   prevTime = currTime;
   ball.x += deltaInSeconds * ball.speed * Math.cos(ball.angle);
   ball.y -= deltaInSeconds * ball.speed * Math.sin(ball.angle);
+  if(player.leftKey){
+    player.x = Math.max(0, player.x - deltaInSeconds*player.speed)
+  }
+  if(player.rightKey){
+    player.x = Math.min(canvas.width - player.width, player.x + deltaInSeconds*player.speed)
+  }
   for(const block of blocks){
     if(isIntersection(block, ball)){
     toggleItem(blocks, block);
