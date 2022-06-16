@@ -2,12 +2,12 @@
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 
-canvas.width = 200;
-canvas.height = 200;
+canvas.width = 600;
+canvas.height = 600;
 
 const player = {
-  x: canvas.width / 2,
-  y: canvas.height - 15,
+  x: canvas.width / 2 - 75,
+  y: canvas.height - 40,
   width: 150,
   height: 20,
   speed: 15,
@@ -22,17 +22,17 @@ const ball = {
 };
 
 const blocks = [
-  { x: 50, y: 50, width: 50, height: 10 },
-  { x: 100, y: 50, width: 50, height: 10 },
-  { x: 150, y: 50, width: 50, height: 10 },
-  { x: 200, y: 50, width: 50, height: 10 },
+  { x: 50, y: 50, width: 50, height: 25 },
+  { x: 100, y: 50, width: 50, height: 25 },
+  { x: 150, y: 50, width: 50, height: 25 },
+  { x: 200, y: 50, width: 50, height: 25 },
 ];
 
 const borders = [
-  { x: 0, y: -10, width: canvas.width, height: 10 },
-  { x: canvas.width, y: 0, width: 10, height: canvas.height },
-  { x: 0, y: canvas.height, width: canvas.width, height: 5 },
-  { x: -10, y: 0, width: 10, height: canvas.height },
+  { x: 0, y: -10, width: canvas.width, height: 20 },
+  { x: canvas.width, y: 0, width: 20, height: canvas.height },
+  { x: 0, y: canvas.height, width: canvas.width, height: 20 },
+  { x: -10, y: 0, width: 20, height: canvas.height },
 ];
 
 let drawRectangle = function (obj) {
