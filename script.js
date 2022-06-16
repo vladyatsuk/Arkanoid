@@ -2,14 +2,14 @@
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 
-canvas.width = 800;
-canvas.height = 800;
+canvas.width = 200;
+canvas.height = 200;
 
 const player = {
   x: canvas.width / 2,
   y: canvas.height - 15,
   width: 150,
-  height: 8,
+  height: 20,
   speed: 15,
 };
 const ball = {
@@ -17,7 +17,7 @@ const ball = {
   y: canvas.width / 2,
   width: 10,
   height: 10,
-  speed: 400,
+  speed: 300,
   angle: Math.PI / 4 + (Math.random() * Math.PI) / 2,
 };
 
@@ -141,8 +141,12 @@ const moveBall = function (currTime) {
   if (isIntersection(borders[1], ball) || isIntersection(borders[3], ball)) {
     ball.angle = Math.PI - ball.angle;
   }
+
+  if(isIntersection(ball, player)) ball.angle = 2*Math.PI - ball.angle;
+
   drawRectangle(ball);
   for(const block of blocks ) drawRectangle(block);
+  drawRectangle(player);
 };
 
 moveBall(0);
