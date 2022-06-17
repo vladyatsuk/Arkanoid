@@ -64,26 +64,17 @@ function isIntersection(blockA, blockB) {
   const pointsA = points(blockA);
   const pointsB = points(blockB);
 
-  for (const pointA of pointsA) {
-    if (
-      blockB.x <= pointA.x &&
-      pointA.x <= blockB.x + blockB.width &&
-      blockB.y <= pointA.y &&
-      pointA.y <= blockB.y + blockB.height
-    )
-      return true;
+  const checker = (points, block) =>{
+    for(const point of points){
+    if(block.x <= point.x &&
+      point.x <= block.x + block.width &&
+      block.y <= point.y &&
+      point.y <= block.y + block.height) return true;
+    }
   }
 
-  for (const pointB of pointsB) {
-    if (
-      blockA.x <= pointB.x &&
-      pointB.x <= blockA.x + blockA.width &&
-      blockA.y <= pointB.y &&
-      pointB.y <= blockA.y + blockA.height
-    )
-      return true;
-  }
-}
+  checker(pointsA, blockB);
+  checker(pointsB, blockA);
 
 function toggleItem(array, item){
   if (array.includes(item)){
