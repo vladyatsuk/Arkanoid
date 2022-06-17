@@ -49,19 +49,20 @@ const clearCanvas = function () {
 };
 
 function isIntersection(blockA, blockB) {
-  const pointsA = [
-    { x: blockA.x, y: blockA.y },
-    { x: blockA.x + blockA.width, y: blockA.y },
-    { x: blockA.x, y: blockA.y + blockA.height },
-    { x: blockA.x + blockA.width, y: blockA.y + blockA.height },
+  
+  const points = (block) => {
+    
+   const array =  [
+    { x: block.x, y: block.y },
+    { x: block.x + block.width, y: block.y },
+    { x: block.x, y: block.y + block.height },
+    { x: block.x + block.width, y: block.y + block.height },
   ];
-
-  const pointsB = [
-    { x: blockB.x, y: blockB.y },
-    { x: blockB.x + blockB.width, y: blockB.y },
-    { x: blockB.x, y: blockB.y + blockB.height },
-    { x: blockB.x + blockB.width, y: blockB.y + blockB.height },
-  ];
+    return array;
+  }
+  
+  const pointsA = points(blockA);
+  const pointsB = points(blockB);
 
   for (const pointA of pointsA) {
     if (
