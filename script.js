@@ -55,10 +55,11 @@ const drawBall = (color, x, y, r) => {
   context.fill();
 };
 
-let drawRectangle = function (obj) {
+let drawRectangle = (color, x, y, width, height) => {
+  context.fillStyle = color;
   context.beginPath();
-  context.rect(obj.x, obj.y, obj.width, obj.height);
-  context.strokeStyle = 'green';
+  context.rect(x, y, width, height);
+  context.fill();
   context.stroke();
 };
 
@@ -114,7 +115,7 @@ const moveBall = function (currTime) {
   }
 
   drawBall('blue', canvas.width/2, canvas.height/2, 10);
-  drawRectangle(player);
+  drawRectangle('red', player.x, player.y, player.width, player.height);
 };
 
 moveBall(0);
