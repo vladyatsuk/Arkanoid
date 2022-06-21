@@ -84,18 +84,30 @@ document.addEventListener('keyup', function (event) {
 
 const changeDirection = () => {
   if (
-    ball.x - ball.size + speedX < 0 ||
-    ball.x + ball.size + speedX > canvas.width
+    ball.x - ball.size + ball.speedX < 0 ||
+    ball.x + ball.size + ball.speedX > canvas.width
   )
-    speedX = -speedX;
-  if (ball.y - ball.size + speedY < 0) speedY = -speedY;
+    ball.speedX = -ball.speedX;
+  if (ball.y - ball.size + ball.speedY < 0) ball.speedY = -ball.speedY;
   if (ball.y - ball.size > player.y) return false;
   if (
     ball.y + ball.size > player.y &&
     ball.x + ball.size > player.x - player.width / 2 &&
     ball.x - ball.size < player.x + player.width / 2
   )
-    speedY = -speedY;
+    ball.speedY = -ball.speedY;
+    for(let i = 0; i < bricks.length; i++){
+      if (!bricks[i].active) continue;
+      if (bricks[i].x < ball.x + ball.size &&
+          ball.x - ball.size < bricks[i].x + brick.width &&
+          bricks[i].y < ball.y + ball.size &&
+          ball.y - ball.size < bricks[i].y + brick.height){
+            bricks[i].active = false;
+            ball.speedY = -ball.speedY;
+            break;
+          }
+    }
+    return true;
 };
 
 let prevTime = 0;
