@@ -1,10 +1,8 @@
 'use strict';
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
-const width = 600;
-const height = 600;
-canvas.width = width;
-canvas.height = height;
+canvas.width = 600;
+canvas.height = 600;
 
 const player = {
   x: canvas.width / 2 - 75,
@@ -18,10 +16,9 @@ const player = {
 const ball = {
   x: canvas.width / 2 - 5,
   y: canvas.width / 2,
-  width: 10,
-  height: 10,
-  speed: 300,
-  angle: Math.PI / 4 + (Math.random() * Math.PI) / 2,
+  size: 10,
+  speedX: 100,
+  speedY: 100,
 };
 
 const blocks = [
@@ -56,44 +53,6 @@ const clearCanvas = function () {
   canvas.width = canvas.width;
 };
 
-function isIntersection(blockA, blockB) {
-  const points = (block) => {
-    const array = [
-      { x: block.x, y: block.y },
-      { x: block.x + block.width, y: block.y },
-      { x: block.x, y: block.y + block.height },
-      { x: block.x + block.width, y: block.y + block.height },
-    ];
-    return array;
-  };
-
-  const pointsA = points(blockA);
-  const pointsB = points(blockB);
-
-  const checker = (points, block) => {
-    for (const point of points) {
-      if (
-        block.x <= point.x &&
-        point.x <= block.x + block.width &&
-        block.y <= point.y &&
-        point.y <= block.y + block.height
-      )
-        return true;
-    }
-  };
-
-  checker(pointsA, blockB);
-  checker(pointsB, blockA);
-}
-function toggleItem(array, item) {
-  if (array.includes(item)) {
-    const index = array.indexOf(item);
-    array.splice(index, 1);
-  } else {
-    array.push(item);
-  }
-}
-
 document.addEventListener('keydown', function (event) {
   if (event.key === 'ArrowLeft') {
     player.leftKey = true;
@@ -108,75 +67,40 @@ document.addEventListener('keyup', function (event) {
     player.rightKey = false;
   }
 });
+
+const changeDirection = () => {
+  if (
+    ball.x - ball.size + speedX < 0 ||
+    ball.x + ball.size + speedX > canvas.width
+  )
+    speedX = -speedX;
+  if (ball.y - ball.size + speedY < 0) speedY = -speedY;
+  if (ball.y - ball.size > player.y) return false;
+  if (
+    ball.y + ball.size > player.y &&
+    ball.x + ball.size > player.x - player.width / 2 &&
+    ball.x - ball.size < player.x + player.width / 2
+  )
+    speedY = -speedY;
+};
+
 let prevTime = 0;
 const moveBall = function (currTime) {
   requestAnimationFrame(moveBall);
   clearCanvas();
   let deltaInSeconds = (currTime - prevTime) / 1000;
   prevTime = currTime;
-  ball.x += deltaInSeconds * ball.speed * Math.cos(ball.angle);
-  ball.y -= deltaInSeconds * ball.speed * Math.sin(ball.angle);
+  ball.x += 0.1;
+  ball.y -= 0.1;
+
   if (player.leftKey) {
     player.x = Math.max(0, player.x - deltaInSeconds * player.speed);
   }
   if (player.rightKey) {
-    player.x = Math.min(
-      canvas.width - player.width,
-      player.x + deltaInSeconds * player.speed
-    );
-  }
-  for (const block of blocks) {
-    if (isIntersection(block, ball)) {
-      toggleItem(blocks, block);
-      const topHitbox = {
-        x: block.x - 10,
-        y: block.y - 10,
-        width: 10 + block.width,
-        height: 10,
-      };
-      const rightHitbox = {
-        x: block.x + block.width,
-        y: block.y - 10,
-        width: 10,
-        height: 10 + block.height,
-      };
-      const bottomHitbox = {
-        x: block.x,
-        y: block.y + block.height,
-        width: block.width + 10,
-        height: 10,
-      };
-      const leftHitbox = {
-        x: block.x - 10,
-        y: block.y,
-        width: 10,
-        height: block.height + 10,
-      };
-      if (
-        isIntersection(topHitbox, ball) ||
-        isIntersection(bottomHitbox, ball)
-      ) {
-        ball.angle = 2 * Math.PI - ball.angle;
-      }
-      if (
-        isIntersection(rightHitbox, ball) ||
-        isIntersection(leftHitbox, ball)
-      ) {
-        ball.angle = Math.PI - ball.angle;
-      }
-    }
-  }
-  if (isIntersection(borders[0], ball) || isIntersection(borders[2], ball)) {
-    ball.angle = 2 * Math.PI - ball.angle;
-  }
-  if (isIntersection(borders[1], ball) || isIntersection(borders[3], ball)) {
-    ball.angle = Math.PI - ball.angle;
+    player.x = Math.min(canvas.width - player.width, player.x + deltaInSeconds * player.speed);
   }
 
-  if (isIntersection(ball, player)) ball.angle = 2 * Math.PI - ball.angle;
-
-  drawRectangle(ball);
-  for (const block of blocks) drawRectangle(block);
+  drawBall('blue', canvas.width/2, canvas.height/2, 10);
   drawRectangle(player);
 };
 
