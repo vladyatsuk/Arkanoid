@@ -21,19 +21,32 @@ const ball = {
   speedY: 100,
 };
 
-const blocks = [
-  { x: 50, y: 50, width: 50, height: 25 },
-  { x: 100, y: 50, width: 50, height: 25 },
-  { x: 150, y: 50, width: 50, height: 25 },
-  { x: 200, y: 50, width: 50, height: 25 },
-];
-
 const borders = [
   { x: 0, y: -10, width: canvas.width, height: 20 },
   { x: canvas.width, y: 0, width: 20, height: canvas.height },
   { x: 0, y: canvas.height, width: canvas.width, height: 20 },
   { x: -10, y: 0, width: 20, height: canvas.height },
 ];
+const brick = {
+  width: 20,
+  height: 10,
+}
+let bricks = [];
+const init = () => {
+  bricks = [];
+  ball.x = canvas.width / 2;
+  ball.y = canvas.height - 100;
+  ball.speedX = 0.1;
+  ball.speedY = -0.1;
+  for(let y = 0; y < 4; y++){
+    for(let x = y; x < 10 - y; x++){
+      bricks.push(
+        {x: 50 + x*brick.width,
+         y: 50 + y*brick.height,
+        active: true});
+      }
+  }  
+}
 
 const drawBall = (color, x, y, r) => {
   context.fillStyle = color;
