@@ -138,6 +138,5 @@ const moveBall = function (currTime) {
 
   drawBall('blue', canvas.width/2, canvas.height/2, 10);
 };
-
-//moveBall(0);
+init();
 draw();
