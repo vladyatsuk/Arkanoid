@@ -120,6 +120,12 @@ const changeDirection = () => {
     return true;
 };
 
+const game = () => {
+  if(!moveBall()){
+    console.log('Game over :(');
+  }
+}
+
 let prevTime = 0;
 const moveBall = function (currTime) {
   requestAnimationFrame(moveBall);
