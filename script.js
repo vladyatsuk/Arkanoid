@@ -63,6 +63,16 @@ let drawRectangle = (color, x, y, width, height) => {
   context.stroke();
 };
 
+const draw = () => {
+  drawRectangle('yellow', 0, 0, canvas.width, canvas.height);
+  drawBall('red', ball.x, ball.y, ball.size);
+  for(let i = 0; i < bricks.length; i++){
+    if(!bricks[i].active) continue;
+    drawRectangle('green', bricks[i].x, bricks[i].y, brick.width, brick.height);
+  }
+  drawRectangle('red', player.x - player.width / 2, player.y, player.width, player.height);
+}
+
 const clearCanvas = function () {
   canvas.width = canvas.width;
 };
@@ -127,7 +137,7 @@ const moveBall = function (currTime) {
   }
 
   drawBall('blue', canvas.width/2, canvas.height/2, 10);
-  drawRectangle('red', player.x, player.y, player.width, player.height);
 };
 
-moveBall(0);
+//moveBall(0);
+draw();
