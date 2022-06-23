@@ -9,37 +9,31 @@ const player = {
   y: canvas.height - 40,
   width: 150,
   height: 20,
-  speed: 200,
+  speed: 3,
   leftKey: false,
   rightKey: false,
 };
 const ball = {
-  x: canvas.width / 2 - 5,
+  x: canvas.width / 2,
   y: canvas.width / 2,
   size: 10,
-  speedX: 100,
-  speedY: 100,
+  speedX: 2,
+  speedY: 2,
 };
 
-const borders = [
-  { x: 0, y: -10, width: canvas.width, height: 20 },
-  { x: canvas.width, y: 0, width: 20, height: canvas.height },
-  { x: 0, y: canvas.height, width: canvas.width, height: 20 },
-  { x: -10, y: 0, width: 20, height: canvas.height },
-];
 const brick = {
-  width: 20,
-  height: 10,
+  width: 50,
+  height: 25,
 }
 let bricks = [];
 const init = () => {
   bricks = [];
   ball.x = canvas.width / 2;
-  ball.y = canvas.height - 100;
-  ball.speedX = 0.1;
-  ball.speedY = -0.1;
+  ball.y = player.y - 10;
+  ball.speedX = 2;
+  ball.speedY = 2;
   for(let y = 0; y < 4; y++){
-    for(let x = y; x < 10 - y; x++){
+    for(let x = 0; x < 10; x++){
       bricks.push(
         {x: 50 + x*brick.width,
          y: 50 + y*brick.height,
@@ -64,13 +58,13 @@ let drawRectangle = (color, x, y, width, height) => {
 };
 
 const draw = () => {
-  drawRectangle('yellow', 0, 0, canvas.width, canvas.height);
+  drawRectangle('white', 0, 0, canvas.width, canvas.height);
   drawBall('red', ball.x, ball.y, ball.size);
   for(let i = 0; i < bricks.length; i++){
     if(!bricks[i].active) continue;
     drawRectangle('green', bricks[i].x, bricks[i].y, brick.width, brick.height);
   }
-  drawRectangle('red', player.x - player.width / 2, player.y, player.width, player.height);
+  drawRectangle('red', player.x, player.y, player.width, player.height);
 }
 
 const clearCanvas = function () {
@@ -92,7 +86,16 @@ document.addEventListener('keyup', function (event) {
   }
 });
 
-const changeDirection = () => {
+const move = () => {
+
+  if (player.leftKey) {
+    player.x = Math.max(0, player.x - player.speed);
+  }
+  if (player.rightKey) {
+    player.x = Math.min(canvas.width - player.width, player.x + player.speed);
+  }
+
+
   if (
     ball.x - ball.size + ball.speedX < 0 ||
     ball.x + ball.size + ball.speedX > canvas.width
@@ -106,6 +109,8 @@ const changeDirection = () => {
     ball.x - ball.size < player.x + player.width / 2
   )
     ball.speedY = -ball.speedY;
+    ball.x += ball.speedX; console.log(ball.x);
+    ball.y -= ball.speedY;
     for(let i = 0; i < bricks.length; i++){
       if (!bricks[i].active) continue;
       if (bricks[i].x < ball.x + ball.size &&
@@ -121,28 +126,12 @@ const changeDirection = () => {
 };
 
 const game = () => {
-  if(!moveBall()){
+  if(!move()){
     console.log('Game over :(');
+    init();
   }
+    draw();
 }
-
-let prevTime = 0;
-const moveBall = function (currTime) {
-  requestAnimationFrame(moveBall);
-  clearCanvas();
-  let deltaInSeconds = (currTime - prevTime) / 1000;
-  prevTime = currTime;
-  ball.x += 0.1;
-  ball.y -= 0.1;
-
-  if (player.leftKey) {
-    player.x = Math.max(0, player.x - deltaInSeconds * player.speed);
-  }
-  if (player.rightKey) {
-    player.x = Math.min(canvas.width - player.width, player.x + deltaInSeconds * player.speed);
-  }
-
-  drawBall('blue', canvas.width/2, canvas.height/2, 10);
-};
+const frameTime = 16.67;
 init();
-draw();
+setInterval(game, 1);
