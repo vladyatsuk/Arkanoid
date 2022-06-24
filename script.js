@@ -4,10 +4,13 @@ const context = canvas.getContext('2d');
 canvas.width = 600;
 canvas.height = 600;
 
+const colors = ['silver', 'maroon', 'red', 'yellow', 'purple', 'fushsia', 'lime', 'navy', 'blue', 'teal', 'aqua'];
+let randColors = [];
+let points = 0;
 const player = {
-  x: canvas.width / 2 - 75,
-  y: canvas.height - 40,
-  width: 150,
+  x: canvas.width / 2 - 50,
+  y: canvas.height - 75,
+  width: 100,
   height: 20,
   speed: 3,
   leftKey: false,
@@ -16,9 +19,9 @@ const player = {
 const ball = {
   x: canvas.width / 2,
   y: canvas.width / 2,
-  size: 10,
-  speedX: 2,
-  speedY: 2,
+  r: 10,
+  speedX: 1.5,
+  speedY: 1.5,
 };
 
 const brick = {
@@ -29,13 +32,14 @@ let bricks = [];
 const init = () => {
   bricks = [];
   ball.x = canvas.width / 2;
-  ball.y = player.y - 10;
-  ball.speedX = 2;
-  ball.speedY = 2;
+  ball.y = player.y - 15;
+  ball.speedX = 1.5;
+  ball.speedY = 1.5;
   for(let y = 0; y < 4; y++){
-    for(let x = 0; x < 10; x++){
+    for(let x = 0; x < 8; x++){ 
+      randColors.push(colors[Math.floor(Math.random()*(colors.length+1))]);
       bricks.push(
-        {x: 50 + x*brick.width,
+        {x: 100 + x*brick.width,
          y: 50 + y*brick.height,
         active: true});
       }
@@ -59,10 +63,10 @@ let drawRectangle = (color, x, y, width, height) => {
 
 const draw = () => {
   drawRectangle('white', 0, 0, canvas.width, canvas.height);
-  drawBall('red', ball.x, ball.y, ball.size);
+  drawBall('red', ball.x, ball.y, ball.r);
   for(let i = 0; i < bricks.length; i++){
     if(!bricks[i].active) continue;
-    drawRectangle('green', bricks[i].x, bricks[i].y, brick.width, brick.height);
+    drawRectangle(randColors[i], bricks[i].x, bricks[i].y, brick.width, brick.height);
   }
   drawRectangle('red', player.x, player.y, player.width, player.height);
 }
@@ -85,39 +89,37 @@ document.addEventListener('keyup', function (event) {
     player.rightKey = false;
   }
 });
-
 const move = () => {
-
   if (player.leftKey) {
     player.x = Math.max(0, player.x - player.speed);
   }
   if (player.rightKey) {
     player.x = Math.min(canvas.width - player.width, player.x + player.speed);
   }
-
-
   if (
-    ball.x - ball.size + ball.speedX < 0 ||
-    ball.x + ball.size + ball.speedX > canvas.width
+    ball.x - ball.r + ball.speedX <= 0 ||
+    ball.x + ball.r + ball.speedX >= canvas.width
   )
     ball.speedX = -ball.speedX;
-  if (ball.y - ball.size + ball.speedY < 0) ball.speedY = -ball.speedY;
-  if (ball.y - ball.size > player.y) return false;
+  if (ball.y - ball.r + ball.speedY <= 0) {ball.speedY = -ball.speedY; ball.y += 5;}
+  if (ball.y - ball.r > player.y + player.height) return false;
   if (
-    ball.y + ball.size > player.y &&
-    ball.x + ball.size > player.x - player.width / 2 &&
-    ball.x - ball.size < player.x + player.width / 2
-  )
-    ball.speedY = -ball.speedY;
-    ball.x += ball.speedX; console.log(ball.x);
+    ball.y + ball.r >= player.y &&
+    ball.x >= player.x && ball.x <= player.x + player.width
+  ){
+     ball.speedY = -ball.speedY; 
+     ball.y -= 5;
+    }
+    ball.x += ball.speedX;
     ball.y -= ball.speedY;
     for(let i = 0; i < bricks.length; i++){
       if (!bricks[i].active) continue;
-      if (bricks[i].x < ball.x + ball.size &&
-          ball.x - ball.size < bricks[i].x + brick.width &&
-          bricks[i].y < ball.y + ball.size &&
-          ball.y - ball.size < bricks[i].y + brick.height){
+      if (bricks[i].x < ball.x + ball.r &&
+          ball.x - ball.r < bricks[i].x + brick.width &&
+          bricks[i].y < ball.y + ball.r &&
+          ball.y - ball.r < bricks[i].y + brick.height){
             bricks[i].active = false;
+            points += 100;
             ball.speedY = -ball.speedY;
             break;
           }
@@ -128,10 +130,13 @@ const move = () => {
 const game = () => {
   if(!move()){
     console.log('Game over :(');
+    points = 0;
+    randColors = [];
     init();
+    ball.x = Math.random()*500 + 50;
+    
   }
     draw();
 }
-const frameTime = 16.67;
 init();
 setInterval(game, 1);
