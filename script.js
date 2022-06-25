@@ -9,7 +9,7 @@ let bricks = [];
 let brickColors = [];
 let points = 0;
 let progress = 0;
-
+const speed = 1.5;
 const player = {
   x: canvas.width / 2 - 50,
   y: canvas.height - 75,
@@ -23,8 +23,8 @@ const ball = {
   x: canvas.width / 2,
   y: canvas.width / 2,
   r: 10,
-  speedX: 1.3,
-  speedY: 1.3,
+  speedX: speed,
+  speedY: speed,
 };
 
 const brick = {
@@ -51,8 +51,8 @@ const init = () => {
   bricks = [];
   ball.x = canvas.width / 2;
   ball.y = player.y - 15;
-  ball.speedX = 1.3;
-  ball.speedY = 1.3;
+  ball.speedX = speed;
+  ball.speedY = speed;
   for(let y = 0; y < 4; y++){
     for(let x = 0; x < 8; x++){ 
       brickColors.push(colors[Math.floor(Math.random()*(colors.length+1))]);
@@ -96,15 +96,17 @@ const move = () => {
   let hitPlayer = (ball.y + ball.r >= player.y) && (ball.x >= player.x) && (ball.x <= player.x + player.width);
   if (player.leftKey) {
     player.x = Math.max(0, player.x - player.speed);
+    if (hitPlayer) ball.speedX = -speed;
   }
   if (player.rightKey) {
     player.x = Math.min(canvas.width - player.width, player.x + player.speed);
+    if(hitPlayer) ball.speedX = speed;
   }
-  if (hitWalls) ball.speedX = -ball.speedX;
-  if (hitCeiling) {ball.speedY = -ball.speedY; ball.y += 5;}
+  if (hitWalls) ball.speedX *= -1;
+  if (hitCeiling) {ball.speedY *= -1; ball.y += 5;}
   if (hitFloor) return false;
   if (hitPlayer){
-     ball.speedY = -ball.speedY; 
+     ball.speedY *= -1; 
      ball.y -= 1;
     }
     ball.x += ball.speedX;
