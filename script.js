@@ -72,7 +72,7 @@ const init = () => {
   ball.speedY = speed;
   for (let y = 0; y < 4; y++) {
     for (let x = 0; x < 8; x++) {
-      brickColors.push(colors[Math.floor(Math.random() * (colors.length + 1))]);
+      brickColors.push(colors[Math.floor(Math.random() * colors.length)]);
       bricks.push({
         x: 100 + x * brick.width,
         y: 100 + y * brick.height,
@@ -80,6 +80,7 @@ const init = () => {
       });
     }
   }
+  console.log(brickColors);
 };
 
 const drawBall = (color, x, y, r) => {
