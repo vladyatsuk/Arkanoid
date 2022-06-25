@@ -48,17 +48,19 @@ const ball = {
 };
 
 document.addEventListener('keydown', function (event) {
-  if (event.key === 'ArrowLeft') {
+  if (event.code === 'KeyA' || event.key === 'ArrowLeft') {
     player.leftKey = true;
-  } else if (event.key === 'ArrowRight') {
+  }
+  if (event.code === 'KeyD' || event.key === 'ArrowRight') {
     player.rightKey = true;
   }
 });
 
 document.addEventListener('keyup', function (event) {
-  if (event.key === 'ArrowLeft') {
+  if (event.code === 'KeyA' || event.key === 'ArrowLeft') {
     player.leftKey = false;
-  } else if (event.key === 'ArrowRight') {
+  }
+  if (event.code === 'KeyD' || event.key === 'ArrowRight') {
     player.rightKey = false;
   }
 });
@@ -68,8 +70,12 @@ const init = () => {
   player.x = startPosX;
   ball.x = canvas.width / 2;
   ball.y = player.y - 15;
-  ball.speedX = speed;
-  ball.speedY = speed;
+  document.addEventListener('keydown', function (event) {
+    if (event.code === 'KeyS' || event.key === 'ArrowDown') {
+      ball.speedX = speed;
+      ball.speedY = speed;
+    }
+  });
   for (let y = 0; y < 4; y++) {
     for (let x = 0; x < 8; x++) {
       brickColors.push(colors[Math.floor(Math.random() * colors.length)]);
@@ -80,7 +86,6 @@ const init = () => {
       });
     }
   }
-  console.log(brickColors);
 };
 
 const drawBall = (color, x, y, r) => {
@@ -164,13 +169,16 @@ const move = () => {
   }
   return true;
 };
+
 const game = () => {
   if (!move()) {
     points = 0;
     brickColors = [];
+    ball.speedX = 0;
+    ball.speedY = 0;
     player.x = canvas.width / 2 - 50;
     init();
-    ball.x = Math.random() * 500 + 50;
+    ball.x = Math.random() * (canvas.width - 100) + 50;
   } else draw();
 };
 init();
