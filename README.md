@@ -1,5 +1,5 @@
 # Arkanoid
-This is an old arcade game.
+I tried to recreate this old arcade game.
 
 I created 3 simple levels
 
