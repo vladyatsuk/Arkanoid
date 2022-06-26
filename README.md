@@ -1,6 +1,8 @@
 # Arkanoid
-This is an old acrade game.
+This is an old arcade game.
+
 The controls are simple:
-Press A/ArrowLeft to move left;
-Press D/ArrowRight to move right;
-Press S/ArrowDown to launch the ball;
+
+Press <code>**A/D**</code> or arrows to move left/right
+
+Press <code>**S**</code> to launch the ball
