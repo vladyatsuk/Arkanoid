@@ -1,13 +1,13 @@
 # Arkanoid
 I tried to recreate this old arcade game.
 
-I created 3 simple levels
+There are 3 simple levels.
 
 The controls are simple:
 
-Press <code>**A/D**</code> or arrows to move left/right
+Press <code>**A/D**</code> or arrows to move left/right;
 
-Press <code>**S**</code> to launch the ball
+Press <code>**S**</code> to launch the ball;
 
 Here is an example of the first level.
 
