@@ -1,19 +1,23 @@
 'use strict';
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
+const scoreLabel = document.getElementById('score');
+const bestScoreLabel = document.getElementById('bestScore');
 canvas.width = 600;
 canvas.height = 600;
 
 const speed = 1.5;
-const startPosX = canvas.width / 2 - 50;
+const boost = 5;
+const playerStartPosX = canvas.width / 2 - 50;
+const playerPosY = canvas.height - 75;
 let bricks = [];
-let brickColors = [];
-let points = 0;
+let score = 0;
+let bestScore = 0;
 let hitCeiling = 0;
 let hitFloor = 0;
 let hitWalls = 0;
 let hitPlayer = 0;
-
+let gameStatus = true;
 const brick = {
   width: 50,
   height: 25,
@@ -31,8 +35,8 @@ const colors = [
 ];
 
 const player = {
-  x: canvas.width / 2 - 50,
-  y: canvas.height - 75,
+  x: playerStartPosX,
+  y: playerPosY,
   width: 100,
   height: 20,
   speed: speed,
@@ -43,8 +47,8 @@ const ball = {
   x: canvas.width / 2,
   y: canvas.width / 2,
   r: 10,
-  speedX: speed,
-  speedY: speed,
+  speedX: 0,
+  speedY: 0,
 };
 
 document.addEventListener('keydown', function (event) {
@@ -67,21 +71,24 @@ document.addEventListener('keyup', function (event) {
 
 const init = () => {
   bricks = [];
-  player.x = startPosX;
+  player.x = playerStartPosX;
   ball.x = canvas.width / 2;
   ball.y = player.y - 15;
   document.addEventListener('keydown', function (event) {
     if (event.code === 'KeyS' || event.key === 'ArrowDown') {
-      ball.speedX = speed;
-      ball.speedY = speed;
+      if (gameStatus) {
+        ball.speedX = speed;
+        ball.speedY = speed;
+        gameStatus = false;
+      }
     }
   });
   for (let y = 0; y < 4; y++) {
     for (let x = 0; x < 8; x++) {
-      brickColors.push(colors[Math.floor(Math.random() * colors.length)]);
       bricks.push({
         x: 100 + x * brick.width,
         y: 100 + y * brick.height,
+        color: colors[Math.floor(Math.random() * colors.length)],
         active: true,
       });
     }
@@ -103,13 +110,19 @@ const drawRectangle = (color, x, y, width, height) => {
   context.stroke();
 };
 
+const drawScore = () => {
+  if (score >= bestScore) bestScore = score;
+  scoreLabel.innerHTML = `Score: ${score}`;
+  bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
+};
+
 const draw = () => {
   drawRectangle('white', 0, 0, canvas.width, canvas.height);
   drawBall('red', ball.x, ball.y, ball.r);
   for (let i = 0; i < bricks.length; i++) {
     if (bricks[i].active) {
       drawRectangle(
-        brickColors[i],
+        bricks[i].color,
         bricks[i].x,
         bricks[i].y,
         brick.width,
@@ -118,6 +131,7 @@ const draw = () => {
     }
   }
   drawRectangle('red', player.x, player.y, player.width, player.height);
+  drawScore();
 };
 
 const hitBrick = (bricks, i) => {
@@ -139,14 +153,19 @@ const move = () => {
     ball.y + ball.r >= player.y &&
     ball.x >= player.x &&
     ball.x <= player.x + player.width;
-  if (hitWalls) ball.speedX *= -1;
+  if (hitWalls) {
+    if (ball.x < canvas.width / 2) {
+      ball.x += boost;
+    } else ball.x += -boost;
+    ball.speedX *= -1;
+  }
   if (hitCeiling) {
     ball.speedY *= -1;
-    ball.y += 5;
+    ball.y += boost;
   }
   if (hitPlayer) {
     ball.speedY *= -1;
-    ball.y -= 1;
+    ball.y -= boost;
   }
   if (hitFloor) return false;
   if (player.leftKey) {
@@ -162,7 +181,7 @@ const move = () => {
   for (let i = 0; i < bricks.length; i++) {
     if (bricks[i].active && hitBrick(bricks, i)) {
       bricks[i].active = false;
-      points += 100;
+      score += 100;
       ball.speedY *= -1;
       break;
     }
@@ -172,13 +191,14 @@ const move = () => {
 
 const game = () => {
   if (!move()) {
-    points = 0;
-    brickColors = [];
+    score = 0;
     ball.speedX = 0;
     ball.speedY = 0;
     player.x = canvas.width / 2 - 50;
+    gameStatus = true;
     init();
     ball.x = Math.random() * (canvas.width - 100) + 50;
+    drawScore();
   } else draw();
 };
 init();
