@@ -47,10 +47,6 @@ const playerPosY = canvas.height - 75;
 let bricks = [];
 let score = 0;
 let bestScore = 0;
-let hitCeiling = 0;
-let hitFloor = 0;
-let hitWalls = 0;
-let hitPlayer = 0;
 let canClickS = true;
 let levelIndex = 0;
 
@@ -180,52 +176,71 @@ const hitBrick = (bricks, i) => {
     ball.y - ball.r < bricks[i].y + brick.height
   );
 };
-
-const move = () => {
-  hitCeiling = ball.y - ball.r + ball.speedY <= 0;
-  hitFloor = ball.y - ball.r > player.y + player.height;
-  hitWalls =
+const removeBrick = () => {
+  for (let i = 0; i < bricks.length; i++) {
+    if (bricks[i].active && hitBrick(bricks, i)) {
+      score += 100 * (levelIndex + 1);
+      bricks[i].active = false;
+      ball.speedY *= -1;
+      break;
+    }
+  }
+};
+const BounceOffCeiling = () => {
+  const hitCeiling = ball.y - ball.r + ball.speedY <= 0;
+  if (hitCeiling) {
+    ball.speedY *= -1;
+    ball.y += boost;
+  }
+};
+const BounceOffWalls = () => {
+  const hitWalls =
     ball.x - ball.r + ball.speedX <= 0 ||
     ball.x + ball.r + ball.speedX >= canvas.width;
-  hitPlayer =
-    ball.y + ball.r >= player.y &&
-    ball.x >= player.x &&
-    ball.x <= player.x + player.width;
-  if (ball.speedX === 0) player.x = playerStartPosX;
   if (hitWalls) {
     if (ball.x < canvas.width / 2) {
       ball.x += boost;
     } else ball.x += -boost;
     ball.speedX *= -1;
   }
-  if (hitCeiling) {
-    ball.speedY *= -1;
-    ball.y += boost;
-  }
+};
+const BounceOffPlayer = () => {
+  const hitPlayer =
+    ball.y + ball.r >= player.y &&
+    ball.x >= player.x &&
+    ball.x <= player.x + player.width;
   if (hitPlayer) {
     ball.speedY *= -1;
     ball.y -= boost;
+    if (moveLeft()) ball.speedX = -speed;
+    if (moveRight()) ball.speedX = speed;
   }
-  if (hitFloor) return false;
+};
+
+const moveLeft = () => {
   if (player.leftKey) {
     player.x = Math.max(0, player.x - player.speed);
-    if (hitPlayer) ball.speedX = -speed;
+    return true;
   }
+};
+const moveRight = () => {
   if (player.rightKey) {
     player.x = Math.min(canvas.width - player.width, player.x + player.speed);
-    if (hitPlayer) ball.speedX = speed;
+    return true;
   }
+};
+
+const move = () => {
+  if (ball.speedX === 0) player.x = playerStartPosX;
+  moveLeft();
+  moveRight();
   ball.x += ball.speedX;
   ball.y -= ball.speedY;
-  for (let i = 0; i < bricks.length; i++) {
-    if (bricks[i].active && hitBrick(bricks, i)) {
-      bricks[i].active = false;
-      score += 100 * (levelIndex + 1);
-      ball.speedY *= -1;
-      break;
-    }
-  }
-  return true;
+};
+
+const isLoss = () => {
+  const hitFloor = ball.y - ball.r > player.y + player.height;
+  if (hitFloor) return true;
 };
 
 const reset = () => {
@@ -239,6 +254,11 @@ const reset = () => {
 };
 
 const game = () => {
+  BounceOffCeiling();
+  BounceOffWalls();
+  BounceOffPlayer();
+  move();
+  removeBrick();
   if (score === 100 * (levelIndex + 1) * bricks.length && levelIndex < 3) {
     score = 0;
     levelIndex += 1;
@@ -250,7 +270,7 @@ const game = () => {
       reset();
     }
   }
-  if (!move()) {
+  if (isLoss()) {
     header.innerHTML = 'You lost :(';
     reset();
     drawScore();
