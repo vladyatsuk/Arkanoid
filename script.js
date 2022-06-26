@@ -47,7 +47,7 @@ const playerPosY = canvas.height - 75;
 let bricks = [];
 let score = 0;
 let bestScore = 0;
-let canClickS = true;
+let canLaunchBall = true;
 let levelIndex = 0;
 
 const brick = {
@@ -71,7 +71,7 @@ const player = {
   y: playerPosY,
   width: 100,
   height: 20,
-  speed: speed,
+  speed,
   leftKey: false,
   rightKey: false,
 };
@@ -83,7 +83,7 @@ const ball = {
   speedY: 0,
 };
 
-document.addEventListener('keydown', function (event) {
+document.addEventListener('keydown', (event) => {
   if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
     player.leftKey = true;
   }
@@ -92,7 +92,7 @@ document.addEventListener('keydown', function (event) {
   }
 });
 
-document.addEventListener('keyup', function (event) {
+document.addEventListener('keyup', (event) => {
   if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
     player.leftKey = false;
   }
@@ -101,21 +101,22 @@ document.addEventListener('keyup', function (event) {
   }
 });
 
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyS' || event.key === 'ArrowDown') {
+    if (canLaunchBall) {
+      header.innerHTML = 'Break all the bricks!';
+      ball.speedX = speed;
+      ball.speedY = speed;
+      canLaunchBall = false;
+    }
+  }
+});
+
 const init = (level) => {
   bricks = [];
   player.x = playerStartPosX;
   ball.x = Math.random() * (canvas.width - 100) + 50;
   ball.y = player.y - 15;
-  document.addEventListener('keydown', function (event) {
-    if (event.code === 'KeyS' || event.key === 'ArrowDown') {
-      if (canClickS) {
-        header.innerHTML = 'Break all the bricks!';
-        ball.speedX = speed;
-        ball.speedY = speed;
-        canClickS = false;
-      }
-    }
-  });
   for (let y = 0; y < level.length; y++) {
     for (let x = 0; x < level.length; x++) {
       if (level[y][x])
@@ -168,52 +169,19 @@ const draw = () => {
   drawScore();
 };
 
-const hitBrick = (bricks, i) => {
-  return (
-    bricks[i].x < ball.x + ball.r &&
-    ball.x - ball.r < bricks[i].x + brick.width &&
-    bricks[i].y < ball.y + ball.r &&
-    ball.y - ball.r < bricks[i].y + brick.height
-  );
-};
 const removeBrick = () => {
   for (let i = 0; i < bricks.length; i++) {
-    if (bricks[i].active && hitBrick(bricks, i)) {
+    const isHitBrick =
+      bricks[i].x < ball.x + ball.r &&
+      ball.x - ball.r < bricks[i].x + brick.width &&
+      bricks[i].y < ball.y + ball.r &&
+      ball.y - ball.r < bricks[i].y + brick.height;
+    if (bricks[i].active && isHitBrick) {
       score += 100 * (levelIndex + 1);
       bricks[i].active = false;
       ball.speedY *= -1;
       break;
     }
-  }
-};
-const BounceOffCeiling = () => {
-  const hitCeiling = ball.y - ball.r + ball.speedY <= 0;
-  if (hitCeiling) {
-    ball.speedY *= -1;
-    ball.y += boost;
-  }
-};
-const BounceOffWalls = () => {
-  const hitWalls =
-    ball.x - ball.r + ball.speedX <= 0 ||
-    ball.x + ball.r + ball.speedX >= canvas.width;
-  if (hitWalls) {
-    if (ball.x < canvas.width / 2) {
-      ball.x += boost;
-    } else ball.x += -boost;
-    ball.speedX *= -1;
-  }
-};
-const BounceOffPlayer = () => {
-  const hitPlayer =
-    ball.y + ball.r >= player.y &&
-    ball.x >= player.x &&
-    ball.x <= player.x + player.width;
-  if (hitPlayer) {
-    ball.speedY *= -1;
-    ball.y -= boost;
-    if (moveLeft()) ball.speedX = -speed;
-    if (moveRight()) ball.speedX = speed;
   }
 };
 
@@ -230,10 +198,41 @@ const moveRight = () => {
   }
 };
 
+const BounceOffCeiling = () => {
+  const hitCeiling = ball.y - ball.r + ball.speedY <= 0;
+  if (hitCeiling) {
+    ball.speedY *= -1;
+    ball.y += boost;
+  }
+};
+
+const BounceOffWalls = () => {
+  const hitWalls =
+    ball.x - ball.r + ball.speedX <= 0 ||
+    ball.x + ball.r + ball.speedX >= canvas.width;
+  if (hitWalls) {
+    if (ball.x < canvas.width / 2) {
+      ball.x += boost;
+    } else ball.x += -boost;
+    ball.speedX *= -1;
+  }
+};
+
+const BounceOffPlayer = () => {
+  const hitPlayer =
+    ball.y + ball.r >= player.y &&
+    ball.x >= player.x &&
+    ball.x <= player.x + player.width;
+  if (hitPlayer) {
+    ball.speedY *= -1;
+    ball.y -= boost;
+    if (moveLeft()) ball.speedX = -speed;
+    if (moveRight()) ball.speedX = speed;
+  }
+};
+
 const move = () => {
   if (ball.speedX === 0) player.x = playerStartPosX;
-  moveLeft();
-  moveRight();
   ball.x += ball.speedX;
   ball.y -= ball.speedY;
 };
@@ -248,7 +247,7 @@ const reset = () => {
   ball.speedX = 0;
   ball.speedY = 0;
   player.x = canvas.width / 2 - 50;
-  canClickS = true;
+  canLaunchBall = true;
   ball.x = Math.random() * (canvas.width - 100) + 50;
   init(LEVELS[levelIndex]);
 };
@@ -257,6 +256,8 @@ const game = () => {
   BounceOffCeiling();
   BounceOffWalls();
   BounceOffPlayer();
+  moveLeft();
+  moveRight();
   move();
   removeBrick();
   if (score === 100 * (levelIndex + 1) * bricks.length && levelIndex < 3) {
@@ -264,12 +265,11 @@ const game = () => {
     score = 0;
     levelIndex += 1;
     header.innerHTML = `You won level ${levelIndex} :)`;
-    reset();
     if (levelIndex === 3) {
-      header.innerHTML = `You won the last level :)`;
+      header.innerHTML = 'You won the last level :)';
       levelIndex = 0;
       reset();
-    }
+    } else reset();
   }
   if (isLoss()) {
     header.innerHTML = 'You lost :(';
