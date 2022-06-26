@@ -243,6 +243,7 @@ const game = () => {
     score = 0;
     levelIndex += 1;
     header.innerHTML = `You won level ${levelIndex} :)`;
+    reset();
     if (levelIndex === 3) {
       header.innerHTML = `You won the last level :)`;
       levelIndex = 0;
