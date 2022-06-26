@@ -260,6 +260,7 @@ const game = () => {
   move();
   removeBrick();
   if (score === 100 * (levelIndex + 1) * bricks.length && levelIndex < 3) {
+    drawScore();
     score = 0;
     levelIndex += 1;
     header.innerHTML = `You won level ${levelIndex} :)`;
