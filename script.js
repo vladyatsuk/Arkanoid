@@ -18,7 +18,8 @@ let hitCeiling = 0;
 let hitFloor = 0;
 let hitWalls = 0;
 let hitPlayer = 0;
-let gameStatus = true;
+let canClickS = true;
+
 const brick = {
   width: 50,
   height: 25,
@@ -77,11 +78,11 @@ const init = () => {
   ball.y = player.y - 15;
   document.addEventListener('keydown', function (event) {
     if (event.code === 'KeyS' || event.key === 'ArrowDown') {
-      if (gameStatus) {
+      if (canClickS) {
         header.innerHTML = 'Break all the bricks!';
         ball.speedX = speed;
         ball.speedY = speed;
-        gameStatus = false;
+        canClickS = false;
       }
     }
   });
@@ -155,6 +156,7 @@ const move = () => {
     ball.y + ball.r >= player.y &&
     ball.x >= player.x &&
     ball.x <= player.x + player.width;
+  if (ball.speedX === 0) player.x = playerStartPosX;
   if (hitWalls) {
     if (ball.x < canvas.width / 2) {
       ball.x += boost;
@@ -190,17 +192,23 @@ const move = () => {
   }
   return true;
 };
-
+const reset = () => {
+  score = 0;
+  ball.speedX = 0;
+  ball.speedY = 0;
+  player.x = canvas.width / 2 - 50;
+  canClickS = true;
+  init();
+  ball.x = Math.random() * (canvas.width - 100) + 50;
+};
 const game = () => {
+  if (score === 3200) {
+    header.innerHTML = 'You won :)';
+    reset();
+  }
   if (!move()) {
     header.innerHTML = 'You lost :(';
-    score = 0;
-    ball.speedX = 0;
-    ball.speedY = 0;
-    player.x = canvas.width / 2 - 50;
-    gameStatus = true;
-    init();
-    ball.x = Math.random() * (canvas.width - 100) + 50;
+    reset();
     drawScore();
   } else draw();
 };
