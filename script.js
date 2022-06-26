@@ -7,6 +7,39 @@ const header = document.getElementById('header');
 canvas.width = 600;
 canvas.height = 600;
 
+const LEVELS = [
+  [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  [
+    [0, 1, 1, 0, 0, 1, 1, 0],
+    [0, 1, 1, 0, 0, 1, 1, 0],
+    [0, 1, 1, 0, 0, 1, 1, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 1, 0],
+    [0, 0, 1, 0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  [
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 0],
+    [0, 1, 0, 1, 1, 0, 1, 0],
+    [1, 0, 1, 0, 0, 1, 0, 1],
+    [1, 0, 1, 0, 0, 1, 0, 1],
+    [0, 1, 0, 1, 1, 0, 1, 0],
+    [0, 0, 1, 0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0],
+  ],
+];
+
 const speed = 1.5;
 const boost = 5;
 const playerStartPosX = canvas.width / 2 - 50;
@@ -19,6 +52,7 @@ let hitFloor = 0;
 let hitWalls = 0;
 let hitPlayer = 0;
 let canClickS = true;
+let levelIndex = 0;
 
 const brick = {
   width: 50,
@@ -71,7 +105,7 @@ document.addEventListener('keyup', function (event) {
   }
 });
 
-const init = () => {
+const init = (level) => {
   bricks = [];
   player.x = playerStartPosX;
   ball.x = canvas.width / 2;
@@ -86,14 +120,15 @@ const init = () => {
       }
     }
   });
-  for (let y = 0; y < 4; y++) {
-    for (let x = 0; x < 8; x++) {
-      bricks.push({
-        x: 100 + x * brick.width,
-        y: 100 + y * brick.height,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        active: true,
-      });
+  for (let y = 0; y < level.length; y++) {
+    for (let x = 0; x < level.length; x++) {
+      if (level[y][x])
+        bricks.push({
+          x: 100 + x * brick.width,
+          y: 100 + y * brick.height,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          active: true,
+        });
     }
   }
 };
@@ -185,26 +220,34 @@ const move = () => {
   for (let i = 0; i < bricks.length; i++) {
     if (bricks[i].active && hitBrick(bricks, i)) {
       bricks[i].active = false;
-      score += 100;
+      score += 100 * (levelIndex + 1);
       ball.speedY *= -1;
       break;
     }
   }
   return true;
 };
+
 const reset = () => {
   score = 0;
   ball.speedX = 0;
   ball.speedY = 0;
   player.x = canvas.width / 2 - 50;
   canClickS = true;
-  init();
   ball.x = Math.random() * (canvas.width - 100) + 50;
+  init(LEVELS[levelIndex]);
 };
+
 const game = () => {
-  if (score === 3200) {
-    header.innerHTML = 'You won :)';
-    reset();
+  if (score === 100 * (levelIndex + 1) * bricks.length && levelIndex < 3) {
+    score = 0;
+    levelIndex += 1;
+    header.innerHTML = `You won level ${levelIndex} :)`;
+    if (levelIndex === 3) {
+      header.innerHTML = `You won the last level :)`;
+      levelIndex = 0;
+      reset();
+    }
   }
   if (!move()) {
     header.innerHTML = 'You lost :(';
@@ -212,5 +255,5 @@ const game = () => {
     drawScore();
   } else draw();
 };
-init();
+init(LEVELS[levelIndex]);
 setInterval(game, 1);
