@@ -108,7 +108,7 @@ document.addEventListener('keyup', function (event) {
 const init = (level) => {
   bricks = [];
   player.x = playerStartPosX;
-  ball.x = canvas.width / 2;
+  ball.x = Math.random() * (canvas.width - 100) + 50;
   ball.y = player.y - 15;
   document.addEventListener('keydown', function (event) {
     if (event.code === 'KeyS' || event.key === 'ArrowDown') {
