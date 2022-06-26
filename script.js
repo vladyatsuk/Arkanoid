@@ -3,6 +3,7 @@ const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 const scoreLabel = document.getElementById('score');
 const bestScoreLabel = document.getElementById('bestScore');
+const header = document.getElementById('header');
 canvas.width = 600;
 canvas.height = 600;
 
@@ -52,19 +53,19 @@ const ball = {
 };
 
 document.addEventListener('keydown', function (event) {
-  if (event.code === 'KeyA' || event.key === 'ArrowLeft') {
+  if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
     player.leftKey = true;
   }
-  if (event.code === 'KeyD' || event.key === 'ArrowRight') {
+  if (event.code === 'KeyD' || event.code === 'ArrowRight') {
     player.rightKey = true;
   }
 });
 
 document.addEventListener('keyup', function (event) {
-  if (event.code === 'KeyA' || event.key === 'ArrowLeft') {
+  if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
     player.leftKey = false;
   }
-  if (event.code === 'KeyD' || event.key === 'ArrowRight') {
+  if (event.code === 'KeyD' || event.code === 'ArrowRight') {
     player.rightKey = false;
   }
 });
@@ -77,6 +78,7 @@ const init = () => {
   document.addEventListener('keydown', function (event) {
     if (event.code === 'KeyS' || event.key === 'ArrowDown') {
       if (gameStatus) {
+        header.innerHTML = 'Break all the bricks!';
         ball.speedX = speed;
         ball.speedY = speed;
         gameStatus = false;
@@ -111,7 +113,7 @@ const drawRectangle = (color, x, y, width, height) => {
 };
 
 const drawScore = () => {
-  if (score >= bestScore) bestScore = score;
+  if (score > bestScore) bestScore = score;
   scoreLabel.innerHTML = `Score: ${score}`;
   bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
 };
@@ -191,6 +193,7 @@ const move = () => {
 
 const game = () => {
   if (!move()) {
+    header.innerHTML = 'You lost :(';
     score = 0;
     ball.speedX = 0;
     ball.speedY = 0;
