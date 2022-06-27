@@ -42,8 +42,10 @@ const LEVELS = [
 
 const speed = 1.5;
 const boost = 5;
+const indent = 50;
 const playerStartPosX = canvas.width / 2 - 50;
 const playerPosY = canvas.height - 75;
+const ballStartPosY = playerPosY - 15;
 let bricks = [];
 let score = 0;
 let bestScore = 0;
@@ -115,8 +117,8 @@ document.addEventListener('keydown', (event) => {
 const init = (level) => {
   bricks = [];
   player.x = playerStartPosX;
-  ball.x = Math.random() * (canvas.width - 100) + 50;
-  ball.y = player.y - 15;
+  ball.x = Math.random() * (canvas.width - 2 * indent) + indent;
+  ball.y = ballStartPosY;
   for (let y = 0; y < level.length; y++) {
     for (let x = 0; x < level.length; x++) {
       if (level[y][x])
@@ -191,6 +193,7 @@ const moveLeft = () => {
     return true;
   }
 };
+
 const moveRight = () => {
   if (player.rightKey) {
     player.x = Math.min(canvas.width - player.width, player.x + player.speed);
@@ -231,8 +234,7 @@ const BounceOffPlayer = () => {
   }
 };
 
-const move = () => {
-  if (ball.speedX === 0) player.x = playerStartPosX;
+const moveBall = () => {
   ball.x += ball.speedX;
   ball.y -= ball.speedY;
 };
@@ -246,36 +248,43 @@ const reset = () => {
   score = 0;
   ball.speedX = 0;
   ball.speedY = 0;
-  player.x = canvas.width / 2 - 50;
+  player.x = playerStartPosX;
   canLaunchBall = true;
-  ball.x = Math.random() * (canvas.width - 100) + 50;
+  ball.x = Math.random() * (canvas.width - 2 * indent) + indent;
   init(LEVELS[levelIndex]);
 };
 
-const game = () => {
-  BounceOffCeiling();
-  BounceOffWalls();
-  BounceOffPlayer();
-  moveLeft();
-  moveRight();
-  move();
-  removeBrick();
-  if (score === 100 * (levelIndex + 1) * bricks.length && levelIndex < 3) {
-    drawScore();
+const showGameStatus = () => {
+  if (score === 100 * (levelIndex + 1) * bricks.length) {
     score = 0;
     levelIndex += 1;
     header.innerHTML = `You won level ${levelIndex} :)`;
     if (levelIndex === 3) {
       header.innerHTML = 'You won the last level :)';
       levelIndex = 0;
-      reset();
-    } else reset();
+    }
+    reset();
   }
   if (isLoss()) {
+    levelIndex = 0;
     header.innerHTML = 'You lost :(';
     reset();
-    drawScore();
-  } else draw();
+  }
+  drawScore();
 };
+
+const game = () => {
+  if (canLaunchBall) player.x = playerStartPosX;
+  BounceOffCeiling();
+  BounceOffWalls();
+  BounceOffPlayer();
+  moveLeft();
+  moveRight();
+  moveBall();
+  removeBrick();
+  draw();
+  showGameStatus();
+};
+
 init(LEVELS[levelIndex]);
 setInterval(game, 1);
