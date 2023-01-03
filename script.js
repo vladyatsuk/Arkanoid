@@ -73,11 +73,31 @@ class Player{
   y = playerPosY;
   leftKey = false;
   rightKey = false;
+
   constructor(width, height, speed){
     this.width = width;
     this.height = height;
     this.speed = speed;
   }
+  draw = (color, x, y, width, height) => {
+    context.fillStyle = color;
+    context.beginPath();
+    context.rect(x, y, width, height);
+    context.fill();
+    context.stroke();
+  };
+  moveLeft = () => {
+    if (this.leftKey) {
+      this.x = Math.max(0, this.x - this.speed);
+      return true;
+    }
+  };
+  moveRight = () => {
+    if (this.rightKey) {
+      this.x = Math.min(canvas.width - this.width, this.x + this.speed);
+      return true;
+    }
+  };
 }
 
 class Ball{
@@ -88,6 +108,16 @@ class Ball{
   constructor(r){
     this.r = r;
   }
+  draw = (color, x, y, r) => {
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(x, y, r, 0, 2 * Math.PI, false);
+    context.fill();
+  };
+  move = () => {
+    this.x += this.speedX;
+    this.y -= this.speedY;
+  };
 }
 
 const ball = new Ball(10);
@@ -140,20 +170,7 @@ const init = (level) => {
   }
 };
 
-const drawBall = (color, x, y, r) => {
-  context.fillStyle = color;
-  context.beginPath();
-  context.arc(x, y, r, 0, 2 * Math.PI, false);
-  context.fill();
-};
 
-const drawRectangle = (color, x, y, width, height) => {
-  context.fillStyle = color;
-  context.beginPath();
-  context.rect(x, y, width, height);
-  context.fill();
-  context.stroke();
-};
 
 const drawScore = () => {
   if (score > bestScore) bestScore = score;
@@ -162,11 +179,11 @@ const drawScore = () => {
 };
 
 const draw = () => {
-  drawRectangle('white', 0, 0, canvas.width, canvas.height);
-  drawBall('red', ball.x, ball.y, ball.r);
+  player.draw('white', 0, 0, canvas.width, canvas.height);
+  ball.draw('red', ball.x, ball.y, ball.r);
   for (let i = 0; i < bricks.length; i++) {
     if (bricks[i].active) {
-      drawRectangle(
+      player.draw(
         bricks[i].color,
         bricks[i].x,
         bricks[i].y,
@@ -175,7 +192,7 @@ const draw = () => {
       );
     }
   }
-  drawRectangle('red', player.x, player.y, player.width, player.height);
+  player.draw('red', player.x, player.y, player.width, player.height);
   drawScore();
 };
 
@@ -195,19 +212,7 @@ const removeBrick = () => {
   }
 };
 
-const moveLeft = () => {
-  if (player.leftKey) {
-    player.x = Math.max(0, player.x - player.speed);
-    return true;
-  }
-};
 
-const moveRight = () => {
-  if (player.rightKey) {
-    player.x = Math.min(canvas.width - player.width, player.x + player.speed);
-    return true;
-  }
-};
 
 const BounceOffCeiling = () => {
   const hitCeiling = ball.y - ball.r + ball.speedY <= 0;
@@ -237,15 +242,12 @@ const BounceOffPlayer = () => {
   if (hitPlayer) {
     ball.speedY *= -1;
     ball.y -= boost;
-    if (moveLeft()) ball.speedX = -speed;
-    if (moveRight()) ball.speedX = speed;
+    if (player.moveLeft()) ball.speedX = -speed;
+    if (player.moveRight()) ball.speedX = speed;
   }
 };
 
-const moveBall = () => {
-  ball.x += ball.speedX;
-  ball.y -= ball.speedY;
-};
+
 
 const isLoss = () => {
   const hitFloor = ball.y - ball.r > player.y + player.height;
@@ -286,9 +288,9 @@ const game = () => {
   BounceOffCeiling();
   BounceOffWalls();
   BounceOffPlayer();
-  moveLeft();
-  moveRight();
-  moveBall();
+  player.moveLeft();
+  player.moveRight();
+  ball.move();
   removeBrick();
   draw();
   showGameStatus();
