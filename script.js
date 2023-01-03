@@ -68,22 +68,30 @@ const colors = [
   'aqua',
 ];
 
-const player = {
-  x: playerStartPosX,
-  y: playerPosY,
-  width: 100,
-  height: 20,
-  speed,
-  leftKey: false,
-  rightKey: false,
-};
-const ball = {
-  x: canvas.width / 2,
-  y: canvas.width / 2,
-  r: 10,
-  speedX: 0,
-  speedY: 0,
-};
+class Player{
+  x = playerStartPosX;
+  y = playerPosY;
+  leftKey = false;
+  rightKey = false;
+  constructor(width, height, speed){
+    this.width = width;
+    this.height = height;
+    this.speed = speed;
+  }
+}
+
+class Ball{
+  x = canvas.width / 2;
+  y = canvas.width / 2;
+  speedX = 0;
+  speedY = 0;
+  constructor(r){
+    this.r = r;
+  }
+}
+
+const ball = new Ball(10);
+const player = new Player(100, 20, 1.5); 
 
 document.addEventListener('keydown', (event) => {
   if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
