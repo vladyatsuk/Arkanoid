@@ -1,4 +1,5 @@
 'use strict';
+
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 const scoreLabel = document.getElementById('score');
@@ -7,61 +8,11 @@ const header = document.getElementById('header');
 canvas.width = 600;
 canvas.height = 600;
 
-const LEVELS = [
-  [
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-  ],
-  [
-    [0, 1, 1, 0, 0, 1, 1, 0],
-    [0, 1, 1, 0, 0, 1, 1, 0],
-    [0, 1, 1, 0, 0, 1, 1, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-  ],
-  [
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0],
-    [0, 1, 0, 1, 1, 0, 1, 0],
-    [1, 0, 1, 0, 0, 1, 0, 1],
-    [1, 0, 1, 0, 0, 1, 0, 1],
-    [0, 1, 0, 1, 1, 0, 1, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-  ],
-];
-
 const speed = 1.5;
-const boost = 5;
-const indent = 50;
 const playerStartPosX = canvas.width / 2 - 50;
 const playerPosY = canvas.height - 75;
 const ballStartPosY = playerPosY - 15;
 let bricks = [];
-let score = 0;
-let bestScore = 0;
-let canLaunchBall = true;
-let levelIndex = 0;
-
-class Brick {
-  width = 50;
-  height = 25;
-  constructor(x, y, color) {
-    this.active = true;
-    this.x = x;
-    this.y = y;
-    this.color = color;
-  }
-}
 
 const colors = [
   'silver',
@@ -74,16 +25,28 @@ const colors = [
   'aqua',
 ];
 
+class Brick {
+  width = 50;
+  height = 25;
+  constructor(x, y, color) {
+    this.active = true;
+    this.x = x;
+    this.y = y;
+    this.color = color;
+  }
+}
+
 class Player {
   x = playerStartPosX;
   y = playerPosY;
   leftKey = false;
   rightKey = false;
-
-  constructor(width, height, speed) {
+  canLaunchBall = true;
+  constructor(width, height, speed, ball) {
     this.width = width;
     this.height = height;
     this.speed = speed;
+    this.ball = ball;
   }
   draw(color, x, y, width, height) {
     context.fillStyle = color;
@@ -107,29 +70,27 @@ class Player {
   setControls() {
     document.addEventListener('keydown', (event) => {
       if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
-        player.leftKey = true;
+        this.leftKey = true;
       }
       if (event.code === 'KeyD' || event.code === 'ArrowRight') {
-        player.rightKey = true;
+        this.rightKey = true;
       }
     });
-
     document.addEventListener('keyup', (event) => {
       if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
-        player.leftKey = false;
+        this.leftKey = false;
       }
       if (event.code === 'KeyD' || event.code === 'ArrowRight') {
-        player.rightKey = false;
+        this.rightKey = false;
       }
     });
-
     document.addEventListener('keydown', (event) => {
       if (event.code === 'KeyS' || event.key === 'ArrowDown') {
-        if (canLaunchBall) {
+        if (this.canLaunchBall) {
           header.innerHTML = 'Break all the bricks!';
-          ball.speedX = speed;
-          ball.speedY = speed;
-          canLaunchBall = false;
+          this.ball.speedX = speed;
+          this.ball.speedY = speed;
+          this.canLaunchBall = false;
         }
       }
     });
@@ -159,15 +120,54 @@ const brick = {
   width: 50,
   height: 25,
 };
+
 class Game {
-  constructor(ball, player) {
+  score = 0;
+  bestScore = 0;
+  levelIndex = 0;
+  boost = 5;
+  indent = 50;
+  LEVELS = [
+    [
+      [1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    [
+      [0, 1, 1, 0, 0, 1, 1, 0],
+      [0, 1, 1, 0, 0, 1, 1, 0],
+      [0, 1, 1, 0, 0, 1, 1, 0],
+      [0, 0, 0, 1, 1, 0, 0, 0],
+      [0, 1, 0, 0, 0, 0, 1, 0],
+      [0, 0, 1, 0, 0, 1, 0, 0],
+      [0, 0, 0, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    [
+      [0, 0, 0, 1, 1, 0, 0, 0],
+      [0, 0, 1, 0, 0, 1, 0, 0],
+      [0, 1, 0, 1, 1, 0, 1, 0],
+      [1, 0, 1, 0, 0, 1, 0, 1],
+      [1, 0, 1, 0, 0, 1, 0, 1],
+      [0, 1, 0, 1, 1, 0, 1, 0],
+      [0, 0, 1, 0, 0, 1, 0, 0],
+      [0, 0, 0, 1, 1, 0, 0, 0],
+    ],
+  ];
+  constructor(ball, player, brick) {
     this.ball = ball;
     this.player = player;
+    this.brick = brick;
   }
   drawScore() {
-    if (score > bestScore) bestScore = score;
-    scoreLabel.innerHTML = `Score: ${score}`;
-    bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
+    if (this.score > this.bestScore) this.bestScore = this.score;
+    scoreLabel.innerHTML = `Score: ${this.score}`;
+    bestScoreLabel.innerHTML = `Best score: ${this.bestScore}`;
   }
   draw() {
     this.player.draw('white', 0, 0, canvas.width, canvas.height);
@@ -197,37 +197,37 @@ class Game {
       this.ball.y - this.ball.r > this.player.y + this.player.height;
     if (hitFloor) return true;
   }
-
   showGameStatus() {
-    if (score === 100 * (levelIndex + 1) * bricks.length) {
-      score = 0;
-      levelIndex += 1;
-      header.innerHTML = `You won level ${levelIndex} :)`;
-      if (levelIndex === 3) {
+    if (this.score === 100 * (this.levelIndex + 1) * bricks.length) {
+      this.score = 0;
+      this.levelIndex += 1;
+      header.innerHTML = `You won level ${this.levelIndex} :)`;
+      if (this.levelIndex === 3) {
         header.innerHTML = 'You won the last level :)';
-        levelIndex = 0;
+        this.levelIndex = 0;
       }
       this.reset();
     }
     if (this.isLoss()) {
-      levelIndex = 0;
+      this.levelIndex = 0;
       header.innerHTML = 'You lost :(';
-      game.reset();
+      this.reset();
     }
-    game.drawScore();
+    this.drawScore();
   }
   init(level) {
     bricks = [];
     this.player.x = playerStartPosX;
-    this.ball.x = Math.random() * (canvas.width - 2 * indent) + indent;
+    this.ball.x =
+      Math.random() * (canvas.width - 2 * this.indent) + this.indent;
     this.ball.y = ballStartPosY;
     for (let y = 0; y < level.length; y++) {
       for (let x = 0; x < level.length; x++) {
         if (level[y][x])
           bricks.push(
             new Brick(
-              100 + x * brick.width,
-              100 + y * brick.height,
+              100 + x * this.brick.width,
+              100 + y * this.brick.height,
               colors[Math.floor(Math.random() * colors.length)]
             )
           );
@@ -236,34 +236,33 @@ class Game {
     this.player.setControls();
   }
   reset() {
-    score = 0;
+    this.score = 0;
     this.ball.speedX = 0;
     this.ball.speedY = 0;
     this.player.x = playerStartPosX;
-    canLaunchBall = true;
-    this.ball.x = Math.random() * (canvas.width - 2 * indent) + indent;
-    this.init(LEVELS[levelIndex]);
+    this.player.canLaunchBall = true;
+    this.ball.x =
+      Math.random() * (canvas.width - 2 * this.indent) + this.indent;
+    this.init(this.LEVELS[this.levelIndex]);
   }
   BounceOffCeiling() {
     const hitCeiling = this.ball.y - this.ball.r + this.ball.speedY <= 0;
     if (hitCeiling) {
       this.ball.speedY *= -1;
-      this.ball.y += boost;
+      this.ball.y += this.boost;
     }
   }
-
   BounceOffWalls() {
     const hitWalls =
       this.ball.x - this.ball.r + this.ball.speedX <= 0 ||
       this.ball.x + this.ball.r + this.ball.speedX >= canvas.width;
     if (hitWalls) {
       if (this.ball.x < canvas.width / 2) {
-        this.ball.x += boost;
-      } else ball.x += -boost;
+        this.ball.x += this.boost;
+      } else ball.x += -this.boost;
       this.ball.speedX *= -1;
     }
   }
-
   BounceOffPlayer() {
     const hitPlayer =
       this.ball.y + this.ball.r >= this.player.y &&
@@ -271,7 +270,7 @@ class Game {
       this.ball.x <= this.player.x + this.player.width;
     if (hitPlayer) {
       this.ball.speedY *= -1;
-      this.ball.y -= boost;
+      this.ball.y -= this.boost;
       if (player.moveLeft()) this.ball.speedX = -speed;
       if (player.moveRight()) this.ball.speedX = speed;
     }
@@ -284,7 +283,7 @@ class Game {
         bricks[i].y < this.ball.y + this.ball.r &&
         this.ball.y - this.ball.r < bricks[i].y + bricks[i].height;
       if (bricks[i].active && isHitBrick) {
-        score += 100 * (levelIndex + 1);
+        this.score += 100 * (this.levelIndex + 1);
         bricks[i].active = false;
         this.ball.speedY *= -1;
         break;
@@ -292,7 +291,7 @@ class Game {
     }
   }
   playgame = () => {
-    if (canLaunchBall) this.player.x = playerStartPosX;
+    if (this.canLaunchBall) this.player.x = playerStartPosX;
     this.BounceOffCeiling();
     this.BounceOffWalls();
     this.BounceOffPlayer();
@@ -306,7 +305,7 @@ class Game {
 }
 
 const ball = new Ball(10);
-const player = new Player(100, 20, 1.5);
-const game = new Game(ball, player);
-game.init(LEVELS[levelIndex]);
+const player = new Player(100, 20, speed, ball);
+const game = new Game(ball, player, brick);
+game.init(game.LEVELS[game.levelIndex]);
 setInterval(game.playgame, 1);
