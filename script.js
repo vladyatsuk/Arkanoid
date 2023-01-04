@@ -61,7 +61,6 @@ class Brick {
     this.y = y;
     this.color = color;
   }
-  
 }
 
 const colors = [
@@ -156,10 +155,10 @@ class Ball {
     this.y -= this.speedY;
   }
 }
-const brick= {
+const brick = {
   width: 50,
   height: 25,
-}
+};
 class Game {
   constructor(ball, player) {
     this.ball = ball;
@@ -291,7 +290,7 @@ class Game {
         break;
       }
     }
-  };
+  }
   playgame = () => {
     if (canLaunchBall) this.player.x = playerStartPosX;
     this.BounceOffCeiling();
@@ -305,8 +304,6 @@ class Game {
     this.showGameStatus();
   };
 }
-
-
 
 const ball = new Ball(10);
 const player = new Player(100, 20, 1.5);
