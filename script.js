@@ -277,7 +277,21 @@ class Game {
       if (player.moveRight()) this.ball.speedX = speed;
     }
   }
-
+  removeBrick() {
+    for (let i = 0; i < bricks.length; i++) {
+      const isHitBrick =
+        bricks[i].x < this.ball.x + this.ball.r &&
+        this.ball.x - this.ball.r < bricks[i].x + bricks[i].width &&
+        bricks[i].y < this.ball.y + this.ball.r &&
+        this.ball.y - this.ball.r < bricks[i].y + bricks[i].height;
+      if (bricks[i].active && isHitBrick) {
+        score += 100 * (levelIndex + 1);
+        bricks[i].active = false;
+        this.ball.speedY *= -1;
+        break;
+      }
+    }
+  };
   playgame = () => {
     if (canLaunchBall) this.player.x = playerStartPosX;
     this.BounceOffCeiling();
@@ -286,27 +300,13 @@ class Game {
     this.player.moveLeft();
     this.player.moveRight();
     this.ball.move();
-    removeBrick();
+    this.removeBrick();
     this.draw();
     this.showGameStatus();
   };
 }
 
-const removeBrick = () => {
-  for (let i = 0; i < bricks.length; i++) {
-    const isHitBrick =
-      bricks[i].x < ball.x + ball.r &&
-      ball.x - ball.r < bricks[i].x + bricks[i].width &&
-      bricks[i].y < ball.y + ball.r &&
-      ball.y - ball.r < bricks[i].y + bricks[i].height;
-    if (bricks[i].active && isHitBrick) {
-      score += 100 * (levelIndex + 1);
-      bricks[i].active = false;
-      ball.speedY *= -1;
-      break;
-    }
-  }
-};
+
 
 const ball = new Ball(10);
 const player = new Player(100, 20, 1.5);
