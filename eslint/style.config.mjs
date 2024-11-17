@@ -11,6 +11,10 @@ const additionalStyleConfig = {
   rules: {
     '@stylistic/array-bracket-newline': ['error'],
     '@stylistic/arrow-parens': ['error', 'always'],
+    '@stylistic/brace-style': [
+      'error', '1tbs',
+      { allowSingleLine: false },
+    ],
     '@stylistic/function-call-spacing': ['error'],
     '@stylistic/function-call-argument-newline': ['error', 'consistent'],
     '@stylistic/function-paren-newline': ['error', 'multiline'],
@@ -87,13 +91,13 @@ const additionalStyleConfig = {
       },
       {
         blankLine: 'always',
-        prev: ['*'],
+        prev: ['multiline-block-like', 'multiline-const', 'multiline-let'],
         next: ['multiline-block-like', 'multiline-const', 'multiline-let'],
       },
       {
         blankLine: 'always',
         prev: ['*'],
-        next: ['return'],
+        next: ['return', 'class'],
       },
     ],
     '@stylistic/semi': ['error', 'always'],
