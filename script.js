@@ -1,21 +1,28 @@
-const canvas = document.querySelector('canvas');
-const context = canvas.getContext('2d');
-const scoreLabel = document.getElementById('score');
-const bestScoreLabel = document.getElementById('bestScore');
-const header = document.getElementById('header');
-canvas.width = 600;
-canvas.height = 600;
+const canvas = document.querySelector('canvas'),
+      canvasCtx = canvas.getContext('2d');
 
-const speed = 1.5;
-const playerStartPosX = canvas.width / 2 - 50;
-const playerPosY = canvas.height - 75;
-const ballStartPosY = playerPosY - 15;
-const boost = 5;
-const indent = 50;
-let bricks = [];
-let score = 0;
-let bestScore = 0;
-let levelIndex = 0;
+const scoreLabelElement = document.getElementById('score'),
+      bestScoreLabelElement = document.getElementById('bestScore'),
+      headerElement = document.getElementById('header');
+
+Object.assign(canvas, { width: 600, height: 600 });
+
+const SPEED = 1.5,
+      BOOST = 5,
+      INDENT = 50,
+      BRICK_PARAMETERS = {
+        width: 50,
+        height: 25,
+      };
+
+const START_PLAYER_POS_X = canvas.width / 2 - 50,
+      START_PLAYER_POS_Y = canvas.height - 75,
+      START_BALL_POS_Y = START_PLAYER_POS_Y - 15;
+
+const START_BRICKS = [],
+      START_SCORE = 0,
+      START_BEST_SCORE = 0,
+      START_LEVEL_INDEX = 0;
 
 const LEVELS = [
   [
@@ -50,7 +57,7 @@ const LEVELS = [
   ],
 ];
 
-const colors = [
+const COLORS = [
   'silver',
   'maroon',
   'yellow',
@@ -74,13 +81,15 @@ class Brick {
 }
 
 class Player {
-  x = playerStartPosX;
-  y = playerPosY;
+  x = START_PLAYER_POS_X;
+  y = START_PLAYER_POS_Y;
   leftKey = false;
   rightKey = false;
   canLaunchBall = true;
 
-  constructor(width, height, speed, ball) {
+  constructor(ctx, header, width, height, speed, ball) {
+    this.ctx = ctx;
+    this.header = header;
     this.width = width;
     this.height = height;
     this.speed = speed;
@@ -88,27 +97,28 @@ class Player {
   }
 
   draw(color, x, y, width, height) {
-    context.fillStyle = color;
-    context.beginPath();
-    context.rect(x, y, width, height);
-    context.fill();
-    context.stroke();
+    const { ctx } = this;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.fill();
+    ctx.stroke();
   }
 
   moveLeft() {
     if (this.leftKey) {
       this.x = Math.max(0, this.x - this.speed);
-
-      return true;
     }
+
+    return this.leftKey;
   }
 
   moveRight() {
     if (this.rightKey) {
       this.x = Math.min(canvas.width - this.width, this.x + this.speed);
-
-      return true;
     }
+
+    return this.rightKey;
   }
 
   setControls() {
@@ -133,9 +143,10 @@ class Player {
     document.addEventListener('keydown', (event) => {
       if (event.code === 'KeyS' || event.key === 'ArrowDown') {
         if (this.canLaunchBall) {
+          const { header, ball } = this;
           header.innerHTML = 'Break all the bricks!';
-          this.ball.speedX = speed;
-          this.ball.speedY = speed;
+          ball.speedX = this.speed;
+          ball.speedY = this.speed;
           this.canLaunchBall = false;
         }
       }
@@ -149,15 +160,17 @@ class Ball {
   speedX = 0;
   speedY = 0;
 
-  constructor(r) {
+  constructor(ctx, r) {
+    this.ctx = ctx;
     this.r = r;
   }
 
   draw(color, x, y, r) {
-    context.fillStyle = color;
-    context.beginPath();
-    context.arc(x, y, r, 0, 2 * Math.PI, false);
-    context.fill();
+    const { ctx } = this;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+    ctx.fill();
   }
 
   move() {
@@ -166,72 +179,86 @@ class Ball {
   }
 }
 
-const brick = {
-  width: 50,
-  height: 25,
-};
-
 class Game {
-  constructor(ball, player, brick) {
+  constructor(
+    header, scoreLabel, bestScoreLabel, score, bestScore, levelIndex,
+    ball, player, brickParameters, bricks,
+  ) {
+    this.header = header;
+    this.scoreLabel = scoreLabel;
+    this.bestScoreLabel = bestScoreLabel;
+    this.score = score;
+    this.bestScore = bestScore;
+    this.levelIndex = levelIndex;
     this.ball = ball;
     this.player = player;
-    this.brick = brick;
+    this.brickParameters = brickParameters;
+    this.bricks = bricks;
   }
 
   drawScore() {
+    let { bestScore } = this;
+    const { score, scoreLabel, bestScoreLabel } = this;
     if (score > bestScore) bestScore = score;
     scoreLabel.innerHTML = `Score: ${score}`;
     bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
   }
 
   draw() {
-    this.player.draw('white', 0, 0, canvas.width, canvas.height);
-    this.ball.draw('red', this.ball.x, this.ball.y, this.ball.r);
+    const { ball, player, bricks } = this;
+    player.draw('white', 0, 0, canvas.width, canvas.height);
+    ball.draw('red', ball.x, ball.y, ball.r);
 
     for (let i = 0; i < bricks.length; i++) {
-      if (bricks[i].active) {
+      const brick = bricks[i];
+      if (brick.active) {
         player.draw(
-          bricks[i].color,
-          bricks[i].x,
-          bricks[i].y,
-          bricks[i].width,
-          bricks[i].height,
+          brick.color,
+          brick.x,
+          brick.y,
+          brick.width,
+          brick.height,
         );
       }
     }
 
-    this.player.draw(
+    player.draw(
       'red',
-      this.player.x,
-      this.player.y,
-      this.player.width,
-      this.player.height,
+      player.x,
+      player.y,
+      player.width,
+      player.height,
     );
+
     this.drawScore();
   }
 
   isLoss() {
-    const hitFloor = this.ball.y - this.ball.r > this.player.y + this.player.height;
+    const { ball, player } = this;
+    const ballTop = ball.y - ball.r,
+          playerBottom = player.y + player.height,
+          hitFloor = ballTop > playerBottom;
 
-    if (hitFloor) return true;
+    return hitFloor;
   }
 
   showGameStatus() {
-    if (score === 100 * (levelIndex + 1) * bricks.length) {
-      score = 0;
-      levelIndex += 1;
-      header.innerHTML = `You won level ${levelIndex} :)`;
+    const { header } = this;
+    if (this.score === 100 * (this.levelIndex + 1) * this.bricks.length) {
+      this.score = 0;
+      this.levelIndex += 1;
+      header.innerHTML = `You won level ${this.levelIndex} :)`;
 
-      if (levelIndex === 3) {
+      if (this.levelIndex === 3) {
         header.innerHTML = 'You won the last level :)';
-        levelIndex = 0;
+        this.levelIndex = 0;
       }
 
       this.reset();
     }
 
     if (this.isLoss()) {
-      levelIndex = 0;
+      this.levelIndex = 0;
       header.innerHTML = 'You lost :(';
       this.reset();
     }
@@ -240,18 +267,18 @@ class Game {
   }
 
   init(level) {
-    bricks = [];
-    this.player.x = playerStartPosX;
-    this.ball.x = Math.random() * (canvas.width - 2 * indent) + indent;
-    this.ball.y = ballStartPosY;
+    this.bricks = [];
+    this.player.x = START_PLAYER_POS_X;
+    this.ball.x = Math.random() * (canvas.width - 2 * INDENT) + INDENT;
+    this.ball.y = START_BALL_POS_Y;
 
     for (let y = 0; y < level.length; y++) {
       for (let x = 0; x < level.length; x++) {
         if (level[y][x]) {
-          bricks.push(new Brick(
-            100 + x * this.brick.width,
-            100 + y * this.brick.height,
-            colors[Math.floor(Math.random() * colors.length)],
+          this.bricks.push(new Brick(
+            100 + x * this.brickParameters.width,
+            100 + y * this.brickParameters.height,
+            COLORS[Math.floor(Math.random() * COLORS.length)],
           ));
         }
       }
@@ -261,83 +288,125 @@ class Game {
   }
 
   reset() {
-    score = 0;
-    this.ball.speedX = 0;
-    this.ball.speedY = 0;
-    this.player.x = playerStartPosX;
-    this.player.canLaunchBall = true;
-    this.ball.x = Math.random() * (canvas.width - 2 * indent) + indent;
-    this.init(LEVELS[levelIndex]);
+    const { ball, player } = this;
+    this.score = 0;
+    ball.speedX = 0;
+    ball.speedY = 0;
+    player.x = START_PLAYER_POS_X;
+    player.canLaunchBall = true;
+    ball.x = Math.random() * (canvas.width - 2 * INDENT) + INDENT;
+    this.init(LEVELS[this.levelIndex]);
   }
 
-  BounceOffCeiling() {
-    const hitCeiling = this.ball.y - this.ball.r + this.ball.speedY <= 0;
+  bounceOffCeiling() {
+    const { ball } = this;
+    const ballTop = ball.y - ball.r,
+          hitCeiling = ballTop + ball.speedY <= 0;
 
     if (hitCeiling) {
-      this.ball.speedY *= -1;
-      this.ball.y += boost;
+      ball.speedY *= -1;
+      ball.y += BOOST;
     }
   }
 
-  BounceOffWalls() {
-    const hitWalls = this.ball.x - this.ball.r + this.ball.speedX <= 0 ||
-      this.ball.x + this.ball.r + this.ball.speedX >= canvas.width;
+  bounceOffWalls() {
+    const { ball } = this;
+    const ballLeft = ball.x - ball.r,
+          ballRight = ball.x + ball.r;
+
+    const hitLeftWall = ballLeft + ball.speedX <= 0,
+          hitRightWall = ballRight + ball.speedX >= canvas.width;
+
+    const hitWalls = hitLeftWall || hitRightWall;
 
     if (hitWalls) {
-      if (this.ball.x < canvas.width / 2) {
-        this.ball.x += boost;
+      if (ball.x < canvas.width / 2) {
+        ball.x += BOOST;
+      } else {
+        ball.x -= BOOST;
       }
-      else { ball.x += -boost; }
 
-      this.ball.speedX *= -1;
+      ball.speedX *= -1;
     }
   }
 
-  BounceOffPlayer() {
-    const hitPlayer = this.ball.y + this.ball.r >= this.player.y &&
-      this.ball.x >= this.player.x &&
-      this.ball.x <= this.player.x + this.player.width;
+  bounceOffPlayer() {
+    const { ball, player } = this;
+    const ballBottom = ball.y + ball.r,
+          ballCenter = ball.x,
+          playerTop = player.y,
+          playerLeft = player.x,
+          playerRight = player.x + player.width;
+
+    const hitPlayer = ballBottom >= playerTop &&
+      ballCenter >= playerLeft &&
+      ballCenter <= playerRight;
 
     if (hitPlayer) {
-      this.ball.speedY *= -1;
-      this.ball.y -= boost;
-      if (player.moveLeft()) this.ball.speedX = -speed;
-      if (player.moveRight()) this.ball.speedX = speed;
+      ball.speedY *= -1;
+      ball.y -= BOOST;
+      if (player.moveLeft()) ball.speedX = -SPEED;
+      if (player.moveRight()) ball.speedX = SPEED;
     }
   }
 
   removeBrick() {
-    for (let i = 0; i < bricks.length; i++) {
-      const isHitBrick = bricks[i].x < this.ball.x + this.ball.r &&
-        this.ball.x - this.ball.r < bricks[i].x + bricks[i].width &&
-        bricks[i].y < this.ball.y + this.ball.r &&
-        this.ball.y - this.ball.r < bricks[i].y + bricks[i].height;
+    const { ball, bricks } = this;
+    const ballTop = ball.y - ball.r,
+          ballRight = ball.x + ball.r,
+          ballBottom = ball.y + ball.r,
+          ballLeft = ball.x - ball.r;
 
-      if (bricks[i].active && isHitBrick) {
-        score += 100 * (levelIndex + 1);
-        bricks[i].active = false;
-        this.ball.speedY *= -1;
+    for (let i = 0; i < bricks.length; i++) {
+      const brick = bricks[i],
+            brickTop = brick.y,
+            brickRight = brick.x + brick.width,
+            brickBottom = brick.y + brick.height,
+            brickLeft = brick.x;
+
+      const isHitBrick = brickLeft < ballRight &&
+        ballLeft < brickRight &&
+        brickTop < ballBottom &&
+        ballTop < brickBottom;
+
+      if (brick.active && isHitBrick) {
+        this.score += 100 * (this.levelIndex + 1);
+        brick.active = false;
+        ball.speedY *= -1;
         break;
       }
     }
   }
 
   playgame = () => {
-    if (this.canLaunchBall) this.player.x = playerStartPosX;
-    this.BounceOffCeiling();
-    this.BounceOffWalls();
-    this.BounceOffPlayer();
-    this.player.moveLeft();
-    this.player.moveRight();
-    this.ball.move();
+    const { ball, player } = this;
+    if (player.canLaunchBall) player.x = START_PLAYER_POS_X;
+    this.bounceOffCeiling();
+    this.bounceOffWalls();
+    this.bounceOffPlayer();
+    player.moveLeft();
+    player.moveRight();
+    ball.move();
     this.removeBrick();
     this.draw();
     this.showGameStatus();
   };
 }
 
-const ball = new Ball(10);
-const player = new Player(100, 20, speed, ball);
-const game = new Game(ball, player, brick);
-game.init(LEVELS[levelIndex]);
+const ball = new Ball(canvasCtx, 10),
+      player = new Player(canvasCtx, headerElement, 100, 20, SPEED, ball),
+      game = new Game(
+        headerElement,
+        scoreLabelElement,
+        bestScoreLabelElement,
+        START_SCORE,
+        START_BEST_SCORE,
+        START_LEVEL_INDEX,
+        ball,
+        player,
+        BRICK_PARAMETERS,
+        START_BRICKS,
+      );
+
+game.init(LEVELS[START_LEVEL_INDEX]);
 setInterval(game.playgame, 1);
