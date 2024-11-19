@@ -263,12 +263,6 @@ class Ball {
     const hitWalls = hitLeftWall || hitRightWall;
 
     if (hitWalls) {
-      if (ball.x < CANVAS_HORIZONTAL_CENTER) {
-        ball.x += BOOST;
-      } else {
-        ball.x -= BOOST;
-      }
-
       ball.speedX *= -1;
     }
   }
