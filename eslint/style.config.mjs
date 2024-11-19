@@ -92,7 +92,10 @@ const additionalStyleConfig = {
       {
         blankLine: 'always',
         prev: ['multiline-block-like', 'const', 'let'],
-        next: ['multiline-block-like', 'multiline-const', 'multiline-let'],
+        next: [
+          'multiline-block-like', 'multiline-const', 'multiline-let',
+          'if', 'do', 'while', 'for',
+        ],
       },
       {
         blankLine: 'always',

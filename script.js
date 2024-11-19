@@ -261,6 +261,7 @@ class Game {
   drawScore() {
     let { bestScore } = this;
     const { score, scoreLabel, bestScoreLabel } = this;
+
     if (score > bestScore) bestScore = score;
     scoreLabel.innerHTML = `Score: ${score}`;
     bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
@@ -453,6 +454,7 @@ class Game {
 
   playgame() {
     const { ball, player } = this;
+
     if (player.canLaunchBall) player.x = START_PLAYER_POS_X;
     this.bounceOffCeiling();
     this.bounceOffWalls();
