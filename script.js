@@ -100,7 +100,7 @@ class Brick {
   width;
   height;
 
-  constructor(x, y, color) {
+  constructor({ x, y, color }) {
     this.active = true;
     this.x = x;
     this.y = y;
@@ -132,7 +132,7 @@ class Player {
   rightKey = false;
   canLaunchBall = true;
 
-  constructor(ctx, header, width, height, speed, ball) {
+  constructor({ ctx, header, width, height, speed, ball }) {
     this.ctx = ctx;
     this.header = header;
     this.width = width;
@@ -223,7 +223,7 @@ class Ball {
   speedX = 0;
   speedY = 0;
 
-  constructor(ctx, r) {
+  constructor({ ctx, r }) {
     this.ctx = ctx;
     this.r = r;
   }
@@ -317,10 +317,10 @@ class Ball {
 }
 
 class Game {
-  constructor(
+  constructor({
     ctx, header, scoreLabel, bestScoreLabel, score, bestScore, levelIndex,
     ball, player, bricks,
-  ) {
+  }) {
     this.ctx = ctx;
     this.header = header;
     this.scoreLabel = scoreLabel;
@@ -394,11 +394,11 @@ class Game {
     for (let y = 0; y < level.length; y++) {
       for (let x = 0; x < level.length; x++) {
         if (level[y][x]) {
-          this.bricks.push(new Brick(
-            Brick.defaultXOffset + x * Brick.defaultWidth,
-            Brick.defeaultYOffset + y * Brick.defaultHeight,
-            COLORS[Math.floor(Math.random() * COLORS.length)],
-          ));
+          this.bricks.push(new Brick({
+            x: Brick.defaultXOffset + x * Brick.defaultWidth,
+            y: Brick.defeaultYOffset + y * Brick.defaultHeight,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          }));
         }
       }
     }
@@ -514,27 +514,27 @@ const main = () => {
         bestScoreLabelElement = document.getElementById('bestScore'),
         headerElement = document.getElementById('header');
 
-  const ball = new Ball(canvasCtx, BALL_RADIUS),
-        player = new Player(
-          canvasCtx,
-          headerElement,
-          PLAYER_WIDTH,
-          PLAYER_HEIGHT,
-          SPEED,
+  const ball = new Ball({ ctx: canvasCtx, r: BALL_RADIUS }),
+        player = new Player({
+          ctx: canvasCtx,
+          header: headerElement,
+          width: PLAYER_WIDTH,
+          height: PLAYER_HEIGHT,
+          speed: SPEED,
           ball,
-        ),
-        game = new Game(
-          canvasCtx,
-          headerElement,
-          scoreLabelElement,
-          bestScoreLabelElement,
-          START_SCORE,
-          START_BEST_SCORE,
-          START_LEVEL_INDEX,
+        }),
+        game = new Game({
+          ctx: canvasCtx,
+          header: headerElement,
+          scoreLabel: scoreLabelElement,
+          bestScoreLabel: bestScoreLabelElement,
+          score: START_SCORE,
+          bestScore: START_BEST_SCORE,
+          levelIndex: START_LEVEL_INDEX,
           ball,
           player,
-          START_BRICKS,
-        );
+          bricks: START_BRICKS,
+        });
 
   Object.assign(canvas, { width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
   game.init();
