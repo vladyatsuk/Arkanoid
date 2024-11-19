@@ -2,11 +2,13 @@ const CANVAS_WIDTH = 600,
       CANVAS_HEIGHT = 600;
 
 const DELAY = 1;
+
 const START_ANGLE = 0,
       // eslint-disable-next-line no-magic-numbers
       FULL_CIRCLE = 2 * Math.PI;
 
 const BALL_RADIUS = 10;
+
 const PLAYER_WIDTH = 100,
       PLAYER_HEIGHT = 20;
 
@@ -157,6 +159,7 @@ class Player {
   setControls() {
     document.addEventListener('keydown', (event) => {
       const { code } = event;
+
       if (code === 'KeyA' || code === 'ArrowLeft') {
         this.leftKey = true;
       }
@@ -167,6 +170,7 @@ class Player {
     });
     document.addEventListener('keyup', (event) => {
       const { code } = event;
+
       if (code === 'KeyA' || code === 'ArrowLeft') {
         this.leftKey = false;
       }
@@ -177,6 +181,7 @@ class Player {
     });
     document.addEventListener('keydown', (event) => {
       const { code } = event;
+
       if (code === 'KeyS' || code === 'ArrowDown') {
         if (this.canLaunchBall) {
           const { header, ball } = this;
@@ -241,6 +246,7 @@ class Game {
 
   draw() {
     const { ball, player, bricks } = this;
+
     const START_X = 0,
           START_Y = 0;
 
@@ -249,6 +255,7 @@ class Game {
 
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
+
       if (brick.active) {
         player.draw(
           brick.color,
@@ -273,6 +280,7 @@ class Game {
 
   isLoss() {
     const { ball, player } = this;
+
     const ballTop = ball.y - ball.r,
           playerBottom = player.y + player.height,
           hitFloor = ballTop > playerBottom;
@@ -282,6 +290,7 @@ class Game {
 
   showGameStatus() {
     const { header, bricks } = this;
+
     if (this.score === BASE_REWARD * this.getCurrentLevel() * bricks.length) {
       this.score = 0;
       this.levelIndex += 1;
@@ -339,6 +348,7 @@ class Game {
 
   bounceOffCeiling() {
     const { ball } = this;
+
     const ballTop = ball.y - ball.r,
           hitCeiling = ballTop + ball.speedY <= TOP_BORDER;
 
@@ -350,6 +360,7 @@ class Game {
 
   bounceOffWalls() {
     const { ball } = this;
+
     const ballLeft = ball.x - ball.r,
           ballRight = ball.x + ball.r;
 
@@ -371,8 +382,9 @@ class Game {
 
   bounceOffPlayer() {
     const { ball, player } = this;
-    const ballBottom = ball.y + ball.r,
-          ballCenter = ball.x;
+
+    const ballCenter = ball.x,
+          ballBottom = ball.y + ball.r;
 
     const playerTop = player.y,
           playerLeft = player.x,
@@ -392,6 +404,7 @@ class Game {
 
   removeBrick() {
     const { ball, bricks } = this;
+
     const ballTop = ball.y - ball.r,
           ballRight = ball.x + ball.r,
           ballBottom = ball.y + ball.r,
