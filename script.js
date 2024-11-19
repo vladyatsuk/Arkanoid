@@ -111,11 +111,13 @@ class Brick {
   }
 
   draw(ctx, color, x, y, width, height) {
+    ctx.save();
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.rect(x, y, width, height);
     ctx.fill();
     ctx.stroke();
+    ctx.restore();
   }
 
   static defaultWidth = 50;
@@ -142,11 +144,13 @@ class Player {
 
   draw(color, x, y, width, height) {
     const { ctx } = this;
+    ctx.save();
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.rect(x, y, width, height);
     ctx.fill();
     ctx.stroke();
+    ctx.restore();
   }
 
   moveLeft() {
@@ -223,10 +227,12 @@ class Ball {
 
   draw(color, x, y, r) {
     const { ctx } = this;
+    ctx.save();
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(x, y, r, START_ANGLE, FULL_CIRCLE, false);
     ctx.fill();
+    ctx.restore();
   }
 
   move() {
