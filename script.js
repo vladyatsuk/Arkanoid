@@ -251,7 +251,7 @@ class Ball {
     }
   }
 
-  bounceOffWallsIfHit() {
+  hitWalls() {
     const ball = this;
 
     const ballLeft = ball.x - ball.r,
@@ -261,6 +261,13 @@ class Ball {
           hitRightWall = ballRight + ball.speedX >= RIGHT_BORDER;
 
     const hitWalls = hitLeftWall || hitRightWall;
+
+    return hitWalls;
+  }
+
+  bounceOffWallsIfHit() {
+    const ball = this;
+    const hitWalls = this.hitWalls();
 
     if (hitWalls) {
       ball.speedX *= -1;
