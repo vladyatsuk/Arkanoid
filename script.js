@@ -152,26 +152,30 @@ class Player {
     ctx.restore();
   }
 
+  leftKeyPressed() {
+    return this.leftKey;
+  }
+
+  rightKeyPressed() {
+    return this.rightKey;
+  }
+
   moveLeftIfKeyPressed() {
-    if (this.leftKey) {
+    if (this.leftKeyPressed()) {
       const nextPosition = this.x - this.speed,
             leftmostPossiblePosition = LEFT_BORDER;
 
       this.x = Math.max(leftmostPossiblePosition, nextPosition);
     }
-
-    return this.leftKey;
   }
 
   moveRightIfKeyPressed() {
-    if (this.rightKey) {
+    if (this.rightKeyPressed()) {
       const nextPosition = this.x + this.speed,
             rightmostPossiblePosition = RIGHT_BORDER - this.width;
 
       this.x = Math.min(rightmostPossiblePosition, nextPosition);
     }
-
-    return this.rightKey;
   }
 
   setControls() {
@@ -298,8 +302,8 @@ class Ball {
     if (hitPlayer) {
       ball.speedY *= -1;
       ball.y -= BOOST;
-      if (player.moveLeftIfKeyPressed()) ball.speedX = -SPEED;
-      if (player.moveRightIfKeyPressed()) ball.speedX = SPEED;
+      if (player.leftKeyPressed()) ball.speedX = -SPEED;
+      if (player.rightKeyPressed()) ball.speedX = SPEED;
     }
   }
 }
