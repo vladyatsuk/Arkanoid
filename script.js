@@ -228,6 +228,22 @@ class Ball {
     this.r = r;
   }
 
+  get top() {
+    return this.y - this.r;
+  }
+
+  get right() {
+    return this.x + this.r;
+  }
+
+  get bottom() {
+    return this.y + this.r;
+  }
+
+  get left() {
+    return this.x - this.r;
+  }
+
   draw(color, x, y, r) {
     const { ctx } = this;
     ctx.save();
@@ -245,9 +261,7 @@ class Ball {
 
   bounceOffCeilingIfHit() {
     const ball = this;
-
-    const ballTop = ball.y - ball.r,
-          hitCeiling = ballTop + ball.speedY <= TOP_BORDER;
+    const hitCeiling = ball.top + ball.speedY <= TOP_BORDER;
 
     if (hitCeiling) {
       ball.speedY *= -1;
@@ -258,11 +272,8 @@ class Ball {
   hitWalls() {
     const ball = this;
 
-    const ballLeft = ball.x - ball.r,
-          ballRight = ball.x + ball.r;
-
-    const hitLeftWall = ballLeft + ball.speedX <= LEFT_BORDER,
-          hitRightWall = ballRight + ball.speedX >= RIGHT_BORDER;
+    const hitLeftWall = ball.left + ball.speedX <= LEFT_BORDER,
+          hitRightWall = ball.right + ball.speedX >= RIGHT_BORDER;
 
     const hitWalls = hitLeftWall || hitRightWall;
 
@@ -281,16 +292,13 @@ class Ball {
   hitPlayer(player) {
     const ball = this;
 
-    const ballCenter = ball.x,
-          ballBottom = ball.y + ball.r;
-
     const playerTop = player.y,
           playerLeft = player.x,
           playerRight = player.x + player.width;
 
-    const hitPlayer = ballBottom >= playerTop &&
-      ballCenter >= playerLeft &&
-      ballCenter <= playerRight;
+    const hitPlayer = ball.bottom >= playerTop &&
+      ball.x >= playerLeft &&
+      ball.x <= playerRight;
 
     return hitPlayer;
   }
@@ -345,9 +353,8 @@ class Game {
   isLoss() {
     const { ball, player } = this;
 
-    const ballTop = ball.y - ball.r,
-          playerBottom = player.y + player.height,
-          hitFloor = ballTop > playerBottom;
+    const playerBottom = player.y + player.height,
+          hitFloor = ball.top > playerBottom;
 
     return hitFloor;
   }
@@ -413,11 +420,6 @@ class Game {
   removeBrickIfHit() {
     const { ball, bricks } = this;
 
-    const ballTop = ball.y - ball.r,
-          ballRight = ball.x + ball.r,
-          ballBottom = ball.y + ball.r,
-          ballLeft = ball.x - ball.r;
-
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i],
             brickTop = brick.y,
@@ -425,10 +427,10 @@ class Game {
             brickBottom = brick.y + brick.height,
             brickLeft = brick.x;
 
-      const isHitBrick = brickLeft < ballRight &&
-        ballLeft < brickRight &&
-        brickTop < ballBottom &&
-        ballTop < brickBottom;
+      const isHitBrick = brickLeft < ball.right &&
+        ball.left < brickRight &&
+        brickTop < ball.bottom &&
+        ball.top < brickBottom;
 
       if (brick.active && isHitBrick) {
         this.score += BASE_REWARD * this.getCurrentLevel();
