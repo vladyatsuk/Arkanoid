@@ -455,7 +455,7 @@ class Game {
     }
   }
 
-  playgame() {
+  playGame() {
     const { ball, player } = this;
 
     if (player.canLaunchBall) player.x = START_PLAYER_POS_X;
@@ -512,4 +512,4 @@ const ball = new Ball(canvasCtx, BALL_RADIUS),
 
 Object.assign(canvas, { width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
 game.init();
-setInterval(() => game.playgame(), DELAY);
+setInterval(() => game.playGame(), DELAY);
