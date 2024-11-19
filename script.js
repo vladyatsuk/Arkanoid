@@ -274,7 +274,7 @@ class Ball {
     }
   }
 
-  bounceOffPlayerIfHit(player) {
+  hitPlayer(player) {
     const ball = this;
 
     const ballCenter = ball.x,
@@ -287,6 +287,13 @@ class Ball {
     const hitPlayer = ballBottom >= playerTop &&
       ballCenter >= playerLeft &&
       ballCenter <= playerRight;
+
+    return hitPlayer;
+  }
+
+  bounceOffPlayerIfHit(player) {
+    const ball = this;
+    const hitPlayer = this.hitPlayer(player);
 
     if (hitPlayer) {
       ball.speedY *= -1;
