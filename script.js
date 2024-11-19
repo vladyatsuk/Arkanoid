@@ -334,12 +334,11 @@ class Game {
   }
 
   drawScore() {
-    let { bestScore } = this;
     const { score, scoreLabel, bestScoreLabel } = this;
 
-    if (score > bestScore) bestScore = score;
+    if (score > this.bestScore) this.bestScore = score;
     scoreLabel.innerHTML = `Score: ${score}`;
-    bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
+    bestScoreLabel.innerHTML = `Best score: ${this.bestScore}`;
   }
 
   drawFrame() {
