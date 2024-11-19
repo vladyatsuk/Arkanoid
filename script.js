@@ -156,7 +156,7 @@ class Player {
     ctx.restore();
   }
 
-  moveLeft() {
+  moveLeftIfKeyPressed() {
     if (this.leftKey) {
       const nextPosition = this.x - this.speed,
             leftmostPossiblePosition = LEFT_BORDER;
@@ -167,7 +167,7 @@ class Player {
     return this.leftKey;
   }
 
-  moveRight() {
+  moveRightIfKeyPressed() {
     if (this.rightKey) {
       const nextPosition = this.x + this.speed,
             rightmostPossiblePosition = RIGHT_BORDER - this.width;
@@ -421,8 +421,8 @@ class Game {
     if (hitPlayer) {
       ball.speedY *= -1;
       ball.y -= BOOST;
-      if (player.moveLeft()) ball.speedX = -SPEED;
-      if (player.moveRight()) ball.speedX = SPEED;
+      if (player.moveLeftIfKeyPressed()) ball.speedX = -SPEED;
+      if (player.moveRightIfKeyPressed()) ball.speedX = SPEED;
     }
   }
 
@@ -462,8 +462,8 @@ class Game {
     this.bounceOffCeilingIfHit();
     this.bounceOffWallsIfHit();
     this.bounceOffPlayerIfHit();
-    player.moveLeft();
-    player.moveRight();
+    player.moveLeftIfKeyPressed();
+    player.moveRightIfKeyPressed();
     ball.move();
     this.removeBrickIfHit();
     this.drawFrame();
