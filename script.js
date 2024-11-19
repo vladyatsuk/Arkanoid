@@ -90,6 +90,9 @@ const COLORS = [
   'aqua',
 ];
 
+const PLAYER_COLOR = 'red';
+const BALL_COLOR = 'red';
+
 const clearCanvas = (ctx) => {
   const START_X = 0,
         START_Y = 0;
@@ -271,7 +274,7 @@ class Game {
     const { ball, player, bricks } = this;
 
     clearCanvas(this.ctx);
-    ball.draw('red', ball.x, ball.y, ball.r);
+    ball.draw(BALL_COLOR, ball.x, ball.y, ball.r);
 
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
@@ -289,7 +292,7 @@ class Game {
     }
 
     player.draw(
-      'red',
+      PLAYER_COLOR,
       player.x,
       player.y,
       player.width,
