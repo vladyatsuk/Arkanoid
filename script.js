@@ -270,7 +270,7 @@ class Game {
     bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
   }
 
-  draw() {
+  drawFrame() {
     const { ball, player, bricks } = this;
 
     clearCanvas(this.ctx);
@@ -370,7 +370,7 @@ class Game {
     this.init();
   }
 
-  bounceOffCeiling() {
+  bounceOffCeilingIfHit() {
     const { ball } = this;
 
     const ballTop = ball.y - ball.r,
@@ -382,7 +382,7 @@ class Game {
     }
   }
 
-  bounceOffWalls() {
+  bounceOffWallsIfHit() {
     const { ball } = this;
 
     const ballLeft = ball.x - ball.r,
@@ -404,7 +404,7 @@ class Game {
     }
   }
 
-  bounceOffPlayer() {
+  bounceOffPlayerIfHit() {
     const { ball, player } = this;
 
     const ballCenter = ball.x,
@@ -426,7 +426,7 @@ class Game {
     }
   }
 
-  removeBrick() {
+  removeBrickIfHit() {
     const { ball, bricks } = this;
 
     const ballTop = ball.y - ball.r,
@@ -459,14 +459,14 @@ class Game {
     const { ball, player } = this;
 
     if (player.canLaunchBall) player.x = START_PLAYER_POS_X;
-    this.bounceOffCeiling();
-    this.bounceOffWalls();
-    this.bounceOffPlayer();
+    this.bounceOffCeilingIfHit();
+    this.bounceOffWallsIfHit();
+    this.bounceOffPlayerIfHit();
     player.moveLeft();
     player.moveRight();
     ball.move();
-    this.removeBrick();
-    this.draw();
+    this.removeBrickIfHit();
+    this.drawFrame();
     this.showGameStatus();
   }
 
