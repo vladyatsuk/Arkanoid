@@ -15,17 +15,11 @@ const TOP_BORDER = 0,
       BOTTOM_BORDER = CANVAS_HEIGHT,
       LEFT_BORDER = 0;
 
-const BRICK_WIDTH = 50,
-      BRICK_HEIGHT = 25;
-
-const BRICKS_X_OFFSET = 100,
-      BRICKS_Y_OFFSET = 100;
-
 const BASE_REWARD = 100;
 
 const SPEED = 1.5,
       BOOST = 5,
-      INDENT = BRICK_WIDTH;
+      INDENT = 50;
 
 // eslint-disable-next-line no-magic-numbers
 const CANVAS_HORIZONTAL_CENTER = CANVAS_WIDTH / 2,
@@ -95,15 +89,22 @@ const COLORS = [
 ];
 
 class Brick {
-  width = BRICK_WIDTH;
-  height = BRICK_HEIGHT;
+  width;
+  height;
 
   constructor(x, y, color) {
     this.active = true;
     this.x = x;
     this.y = y;
     this.color = color;
+    this.width = Brick.defaultWidth;
+    this.height = Brick.defaultHeight;
   }
+
+  static defaultWidth = 50;
+  static defaultHeight = 25;
+  static defaultXOffset = 100;
+  static defeaultYOffset = 100;
 }
 
 class Player {
@@ -133,7 +134,10 @@ class Player {
 
   moveLeft() {
     if (this.leftKey) {
-      this.x = Math.max(LEFT_BORDER, this.x - this.speed);
+      const nextPosition = this.x - this.speed,
+            leftmostPossiblePosition = LEFT_BORDER;
+
+      this.x = Math.max(leftmostPossiblePosition, nextPosition);
     }
 
     return this.leftKey;
@@ -141,7 +145,10 @@ class Player {
 
   moveRight() {
     if (this.rightKey) {
-      this.x = Math.min(RIGHT_BORDER - this.width, this.x + this.speed);
+      const nextPosition = this.x + this.speed,
+            rightmostPossiblePosition = RIGHT_BORDER - this.width;
+
+      this.x = Math.min(rightmostPossiblePosition, nextPosition);
     }
 
     return this.rightKey;
@@ -149,25 +156,28 @@ class Player {
 
   setControls() {
     document.addEventListener('keydown', (event) => {
-      if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
+      const { code } = event;
+      if (code === 'KeyA' || code === 'ArrowLeft') {
         this.leftKey = true;
       }
 
-      if (event.code === 'KeyD' || event.code === 'ArrowRight') {
+      if (code === 'KeyD' || code === 'ArrowRight') {
         this.rightKey = true;
       }
     });
     document.addEventListener('keyup', (event) => {
-      if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
+      const { code } = event;
+      if (code === 'KeyA' || code === 'ArrowLeft') {
         this.leftKey = false;
       }
 
-      if (event.code === 'KeyD' || event.code === 'ArrowRight') {
+      if (code === 'KeyD' || code === 'ArrowRight') {
         this.rightKey = false;
       }
     });
     document.addEventListener('keydown', (event) => {
-      if (event.code === 'KeyS' || event.key === 'ArrowDown') {
+      const { code } = event;
+      if (code === 'KeyS' || code === 'ArrowDown') {
         if (this.canLaunchBall) {
           const { header, ball } = this;
           header.innerHTML = 'Break all the bricks!';
@@ -208,7 +218,7 @@ class Ball {
 class Game {
   constructor(
     header, scoreLabel, bestScoreLabel, score, bestScore, levelIndex,
-    ball, player, brickWidth, brickHeight, bricks,
+    ball, player, bricks,
   ) {
     this.header = header;
     this.scoreLabel = scoreLabel;
@@ -218,8 +228,6 @@ class Game {
     this.levelIndex = levelIndex;
     this.ball = ball;
     this.player = player;
-    this.brickWidth = brickWidth;
-    this.brickHeight = brickHeight;
     this.bricks = bricks;
   }
 
@@ -296,7 +304,8 @@ class Game {
     this.drawScore();
   }
 
-  init(level) {
+  init() {
+    const level = LEVELS[this.levelIndex];
     this.bricks = [];
     this.player.x = START_PLAYER_POS_X;
     this.ball.x = Game.generateRandomPosition();
@@ -306,8 +315,8 @@ class Game {
       for (let x = 0; x < level.length; x++) {
         if (level[y][x]) {
           this.bricks.push(new Brick(
-            BRICKS_X_OFFSET + x * this.brickWidth,
-            BRICKS_Y_OFFSET + y * this.brickHeight,
+            Brick.defaultXOffset + x * Brick.defaultWidth,
+            Brick.defeaultYOffset + y * Brick.defaultHeight,
             COLORS[Math.floor(Math.random() * COLORS.length)],
           ));
         }
@@ -325,7 +334,7 @@ class Game {
     player.x = START_PLAYER_POS_X;
     player.canLaunchBall = true;
     ball.x = Game.generateRandomPosition();
-    this.init(LEVELS[this.levelIndex]);
+    this.init();
   }
 
   bounceOffCeiling() {
@@ -363,8 +372,9 @@ class Game {
   bounceOffPlayer() {
     const { ball, player } = this;
     const ballBottom = ball.y + ball.r,
-          ballCenter = ball.x,
-          playerTop = player.y,
+          ballCenter = ball.x;
+
+    const playerTop = player.y,
           playerLeft = player.x,
           playerRight = player.x + player.width;
 
@@ -458,11 +468,9 @@ const ball = new Ball(canvasCtx, BALL_RADIUS),
         START_LEVEL_INDEX,
         ball,
         player,
-        BRICK_WIDTH,
-        BRICK_HEIGHT,
         START_BRICKS,
       );
 
 Object.assign(canvas, { width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
-game.init(LEVELS[START_LEVEL_INDEX]);
+game.init();
 setInterval(() => game.playgame(), DELAY);
