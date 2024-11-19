@@ -3,6 +3,9 @@ const CANVAS_WIDTH = 600,
 
 const DELAY = 1;
 
+const START_X = 0,
+      START_Y = 0;
+
 const START_ANGLE = 0,
       // eslint-disable-next-line no-magic-numbers
       FULL_CIRCLE = 2 * Math.PI;
@@ -92,13 +95,6 @@ const COLORS = [
 
 const PLAYER_COLOR = 'red';
 const BALL_COLOR = 'red';
-
-const clearCanvas = (ctx) => {
-  const START_X = 0,
-        START_Y = 0;
-
-  ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
-};
 
 class Brick {
   width;
@@ -327,34 +323,10 @@ class Game {
   }
 
   drawFrame() {
-    const { ball, player, bricks } = this;
-
-    clearCanvas(this.ctx);
-    ball.draw(BALL_COLOR, ball.x, ball.y, ball.r);
-
-    for (let i = 0; i < bricks.length; i++) {
-      const brick = bricks[i];
-
-      if (brick.active) {
-        brick.draw(
-          this.ctx,
-          brick.color,
-          brick.x,
-          brick.y,
-          brick.width,
-          brick.height,
-        );
-      }
-    }
-
-    player.draw(
-      PLAYER_COLOR,
-      player.x,
-      player.y,
-      player.width,
-      player.height,
-    );
-
+    this.clearCanvas();
+    this.drawBall();
+    this.drawBricks();
+    this.drawPlayer();
     this.drawScore();
   }
 
@@ -478,6 +450,45 @@ class Game {
   getCurrentLevel() {
     // eslint-disable-next-line no-magic-numbers
     return this.levelIndex + 1;
+  }
+
+  clearCanvas() {
+    this.ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+
+  drawPlayer() {
+    const { player } = this;
+    player.draw(
+      PLAYER_COLOR,
+      player.x,
+      player.y,
+      player.width,
+      player.height,
+    );
+  }
+
+  drawBall() {
+    const { ball } = this;
+    ball.draw(BALL_COLOR, ball.x, ball.y, ball.r);
+  }
+
+  drawBricks() {
+    const { bricks } = this;
+
+    for (let i = 0; i < bricks.length; i++) {
+      const brick = bricks[i];
+
+      if (brick.active) {
+        brick.draw(
+          this.ctx,
+          brick.color,
+          brick.x,
+          brick.y,
+          brick.width,
+          brick.height,
+        );
+      }
+    }
   }
 }
 
