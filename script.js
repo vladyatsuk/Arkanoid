@@ -506,35 +506,39 @@ class Game {
   }
 }
 
-const canvas = document.querySelector('canvas'),
-      canvasCtx = canvas.getContext('2d');
+const main = () => {
+  const canvas = document.querySelector('canvas'),
+        canvasCtx = canvas.getContext('2d');
 
-const scoreLabelElement = document.getElementById('score'),
-      bestScoreLabelElement = document.getElementById('bestScore'),
-      headerElement = document.getElementById('header');
+  const scoreLabelElement = document.getElementById('score'),
+        bestScoreLabelElement = document.getElementById('bestScore'),
+        headerElement = document.getElementById('header');
 
-const ball = new Ball(canvasCtx, BALL_RADIUS),
-      player = new Player(
-        canvasCtx,
-        headerElement,
-        PLAYER_WIDTH,
-        PLAYER_HEIGHT,
-        SPEED,
-        ball,
-      ),
-      game = new Game(
-        canvasCtx,
-        headerElement,
-        scoreLabelElement,
-        bestScoreLabelElement,
-        START_SCORE,
-        START_BEST_SCORE,
-        START_LEVEL_INDEX,
-        ball,
-        player,
-        START_BRICKS,
-      );
+  const ball = new Ball(canvasCtx, BALL_RADIUS),
+        player = new Player(
+          canvasCtx,
+          headerElement,
+          PLAYER_WIDTH,
+          PLAYER_HEIGHT,
+          SPEED,
+          ball,
+        ),
+        game = new Game(
+          canvasCtx,
+          headerElement,
+          scoreLabelElement,
+          bestScoreLabelElement,
+          START_SCORE,
+          START_BEST_SCORE,
+          START_LEVEL_INDEX,
+          ball,
+          player,
+          START_BRICKS,
+        );
 
-Object.assign(canvas, { width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
-game.init();
-setInterval(() => game.playGame(), DELAY);
+  Object.assign(canvas, { width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
+  game.init();
+  setInterval(() => game.playGame(), DELAY);
+};
+
+main();
