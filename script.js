@@ -90,6 +90,13 @@ const COLORS = [
   'aqua',
 ];
 
+const clearCanvas = (ctx) => {
+  const START_X = 0,
+        START_Y = 0;
+
+  ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
+};
+
 class Brick {
   width;
   height;
@@ -101,6 +108,14 @@ class Brick {
     this.color = color;
     this.width = Brick.defaultWidth;
     this.height = Brick.defaultHeight;
+  }
+
+  draw(ctx, color, x, y, width, height) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.fill();
+    ctx.stroke();
   }
 
   static defaultWidth = 50;
@@ -222,9 +237,10 @@ class Ball {
 
 class Game {
   constructor(
-    header, scoreLabel, bestScoreLabel, score, bestScore, levelIndex,
+    ctx, header, scoreLabel, bestScoreLabel, score, bestScore, levelIndex,
     ball, player, bricks,
   ) {
+    this.ctx = ctx;
     this.header = header;
     this.scoreLabel = scoreLabel;
     this.bestScoreLabel = bestScoreLabel;
@@ -247,17 +263,15 @@ class Game {
   draw() {
     const { ball, player, bricks } = this;
 
-    const START_X = 0,
-          START_Y = 0;
-
-    player.draw('white', START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
+    clearCanvas(this.ctx);
     ball.draw('red', ball.x, ball.y, ball.r);
 
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
 
       if (brick.active) {
-        player.draw(
+        brick.draw(
+          this.ctx,
           brick.color,
           brick.x,
           brick.y,
@@ -473,6 +487,7 @@ const ball = new Ball(canvasCtx, BALL_RADIUS),
         ball,
       ),
       game = new Game(
+        canvasCtx,
         headerElement,
         scoreLabelElement,
         bestScoreLabelElement,
