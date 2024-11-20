@@ -260,58 +260,45 @@ class Ball {
   }
 
   bounceOffCeilingIfHit() {
-    const ball = this;
-    const hitCeiling = ball.top + ball.speedY <= TOP_BORDER;
+    const hitCeiling = this.top + this.speedY <= TOP_BORDER;
 
     if (hitCeiling) {
-      ball.speedY *= -1;
-      ball.y += BOOST;
+      this.speedY *= -1;
+      this.y += BOOST;
     }
   }
 
   hitWalls() {
-    const ball = this;
+    const hitLeftWall = this.left + this.speedX <= LEFT_BORDER,
+          hitRightWall = this.right + this.speedX >= RIGHT_BORDER;
 
-    const hitLeftWall = ball.left + ball.speedX <= LEFT_BORDER,
-          hitRightWall = ball.right + ball.speedX >= RIGHT_BORDER;
-
-    const hitWalls = hitLeftWall || hitRightWall;
-
-    return hitWalls;
+    return hitLeftWall || hitRightWall;
   }
 
   bounceOffWallsIfHit() {
-    const ball = this;
-    const hitWalls = this.hitWalls();
-
-    if (hitWalls) {
-      ball.speedX *= -1;
+    if (this.hitWalls()) {
+      this.speedX *= -1;
     }
   }
 
   hitPlayer(player) {
-    const ball = this;
-
     const playerTop = player.y,
           playerLeft = player.x,
           playerRight = player.x + player.width;
 
-    const hitPlayer = ball.bottom >= playerTop &&
-      ball.x >= playerLeft &&
-      ball.x <= playerRight;
+    const hitPlayer = this.bottom >= playerTop &&
+      this.x >= playerLeft &&
+      this.x <= playerRight;
 
     return hitPlayer;
   }
 
   bounceOffPlayerIfHit(player) {
-    const ball = this;
-    const hitPlayer = this.hitPlayer(player);
-
-    if (hitPlayer) {
-      ball.speedY *= -1;
-      ball.y -= BOOST;
-      if (player.leftKeyPressed()) ball.speedX = -SPEED;
-      if (player.rightKeyPressed()) ball.speedX = SPEED;
+    if (this.hitPlayer(player)) {
+      this.speedY *= -1;
+      this.y -= BOOST;
+      if (player.leftKeyPressed()) this.speedX = -SPEED;
+      if (player.rightKeyPressed()) this.speedX = SPEED;
     }
   }
 }
