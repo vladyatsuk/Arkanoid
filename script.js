@@ -184,16 +184,16 @@ class Player {
     ctx.restore();
   }
 
-  leftKeyPressed() {
+  get leftKeyPressed() {
     return this.leftKey;
   }
 
-  rightKeyPressed() {
+  get rightKeyPressed() {
     return this.rightKey;
   }
 
   moveLeftIfKeyPressed() {
-    if (this.leftKeyPressed()) {
+    if (this.leftKeyPressed) {
       const nextPosition = this.x - this.speed,
             leftmostPossiblePosition = LEFT_BORDER;
 
@@ -202,7 +202,7 @@ class Player {
   }
 
   moveRightIfKeyPressed() {
-    if (this.rightKeyPressed()) {
+    if (this.rightKeyPressed) {
       const nextPosition = this.x + this.speed,
             rightmostPossiblePosition = RIGHT_BORDER - this.width;
 
@@ -291,42 +291,53 @@ class Ball {
     this.y -= this.speedY;
   }
 
-  bounceOffCeilingIfHit() {
-    const hitCeiling = this.top + this.speedY <= TOP_BORDER;
-
-    if (hitCeiling) {
-      this.speedY *= -1;
-      this.y += BOOST;
-    }
-  }
-
-  hitWalls() {
+  get hitWalls() {
     const hitLeftWall = this.left + this.speedX <= LEFT_BORDER,
           hitRightWall = this.right + this.speedX >= RIGHT_BORDER;
 
     return hitLeftWall || hitRightWall;
   }
 
-  bounceOffWallsIfHit() {
-    if (this.hitWalls()) {
-      this.speedX *= -1;
-    }
+  get hitCeiling() {
+    return this.top + this.speedY <= TOP_BORDER;
+  }
+
+  belowPlayer(player) {
+    return this.top > player.bottom;
   }
 
   hitPlayer(player) {
-    const hitPlayer = this.bottom >= player.top &&
+    return this.bottom >= player.top &&
       this.x >= player.left &&
       this.x <= player.right;
+  }
 
-    return hitPlayer;
+  hitBrick(brick) {
+    return brick.left < this.right &&
+      this.left < brick.right &&
+      brick.top < this.bottom &&
+      this.top < brick.bottom;
+  }
+
+  bounceOffCeilingIfHit() {
+    if (this.hitCeiling) {
+      this.speedY *= -1;
+      this.y += BOOST;
+    }
+  }
+
+  bounceOffWallsIfHit() {
+    if (this.hitWalls) {
+      this.speedX *= -1;
+    }
   }
 
   bounceOffPlayerIfHit(player) {
     if (this.hitPlayer(player)) {
       this.speedY *= -1;
       this.y -= BOOST;
-      if (player.leftKeyPressed()) this.speedX = -SPEED;
-      if (player.rightKeyPressed()) this.speedX = SPEED;
+      if (player.leftKeyPressed) this.speedX = -SPEED;
+      if (player.rightKeyPressed) this.speedX = SPEED;
     }
   }
 }
@@ -367,9 +378,7 @@ class Game {
   isLoss() {
     const { ball, player } = this;
 
-    const hitFloor = ball.top > player.bottom;
-
-    return hitFloor;
+    return ball.belowPlayer(player);
   }
 
   showGameStatus() {
@@ -436,12 +445,7 @@ class Game {
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
 
-      const isHitBrick = brick.left < ball.right &&
-        ball.left < brick.right &&
-        brick.top < ball.bottom &&
-        ball.top < brick.bottom;
-
-      if (brick.active && isHitBrick) {
+      if (brick.active && ball.hitBrick(brick)) {
         this.score += BASE_REWARD * this.getCurrentLevel();
         brick.active = false;
         ball.speedY *= -1;
