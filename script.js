@@ -96,6 +96,11 @@ const COLORS = [
 const PLAYER_COLOR = 'red';
 const BALL_COLOR = 'red';
 
+const BRICK_WIDTH = 50,
+      BRICK_HEIGHT = 25,
+      BRICK_X_OFFSET = 100,
+      BRICK_Y_OFFSET = 100;
+
 class Brick {
   width;
   height;
@@ -105,8 +110,8 @@ class Brick {
     this.x = x;
     this.y = y;
     this.color = color;
-    this.width = Brick.defaultWidth;
-    this.height = Brick.defaultHeight;
+    this.width = BRICK_WIDTH;
+    this.height = BRICK_HEIGHT;
   }
 
   draw(ctx, color, x, y, width, height) {
@@ -118,11 +123,6 @@ class Brick {
     ctx.stroke();
     ctx.restore();
   }
-
-  static defaultWidth = 50;
-  static defaultHeight = 25;
-  static defaultXOffset = 100;
-  static defeaultYOffset = 100;
 }
 
 class Player {
@@ -394,8 +394,8 @@ class Game {
       for (let x = 0; x < level.length; x++) {
         if (level[y][x]) {
           this.bricks.push(new Brick({
-            x: Brick.defaultXOffset + x * Brick.defaultWidth,
-            y: Brick.defeaultYOffset + y * Brick.defaultHeight,
+            x: BRICK_X_OFFSET + x * BRICK_WIDTH,
+            y: BRICK_Y_OFFSET + y * BRICK_HEIGHT,
             color: COLORS[Math.floor(Math.random() * COLORS.length)],
           }));
         }
