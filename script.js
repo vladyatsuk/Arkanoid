@@ -114,6 +114,22 @@ class Brick {
     this.height = BRICK_HEIGHT;
   }
 
+  get top() {
+    return this.y;
+  }
+
+  get right() {
+    return this.x + this.width;
+  }
+
+  get bottom() {
+    return this.y + this.height;
+  }
+
+  get left() {
+    return this.x;
+  }
+
   draw(ctx, color, x, y, width, height) {
     ctx.save();
     ctx.fillStyle = color;
@@ -139,6 +155,22 @@ class Player {
     this.height = height;
     this.speed = speed;
     this.ball = ball;
+  }
+
+  get top() {
+    return this.y;
+  }
+
+  get right() {
+    return this.x + this.width;
+  }
+
+  get bottom() {
+    return this.y + this.height;
+  }
+
+  get left() {
+    return this.x;
   }
 
   draw(color, x, y, width, height) {
@@ -282,13 +314,9 @@ class Ball {
   }
 
   hitPlayer(player) {
-    const playerTop = player.y,
-          playerLeft = player.x,
-          playerRight = player.x + player.width;
-
-    const hitPlayer = this.bottom >= playerTop &&
-      this.x >= playerLeft &&
-      this.x <= playerRight;
+    const hitPlayer = this.bottom >= player.top &&
+      this.x >= player.left &&
+      this.x <= player.right;
 
     return hitPlayer;
   }
@@ -339,8 +367,7 @@ class Game {
   isLoss() {
     const { ball, player } = this;
 
-    const playerBottom = player.y + player.height,
-          hitFloor = ball.top > playerBottom;
+    const hitFloor = ball.top > player.bottom;
 
     return hitFloor;
   }
@@ -407,16 +434,12 @@ class Game {
     const { ball, bricks } = this;
 
     for (let i = 0; i < bricks.length; i++) {
-      const brick = bricks[i],
-            brickTop = brick.y,
-            brickRight = brick.x + brick.width,
-            brickBottom = brick.y + brick.height,
-            brickLeft = brick.x;
+      const brick = bricks[i];
 
-      const isHitBrick = brickLeft < ball.right &&
-        ball.left < brickRight &&
-        brickTop < ball.bottom &&
-        ball.top < brickBottom;
+      const isHitBrick = brick.left < ball.right &&
+        ball.left < brick.right &&
+        brick.top < ball.bottom &&
+        ball.top < brick.bottom;
 
       if (brick.active && isHitBrick) {
         this.score += BASE_REWARD * this.getCurrentLevel();
