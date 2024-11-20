@@ -192,22 +192,22 @@ class Player {
     return this.rightKey;
   }
 
-  moveLeftIfKeyPressed() {
+  get nextPosition() {
     if (this.leftKeyPressed) {
-      const nextPosition = this.x - this.speed,
-            leftmostPossiblePosition = LEFT_BORDER;
-
-      this.x = Math.max(leftmostPossiblePosition, nextPosition);
+      const leftmostPossiblePosition = LEFT_BORDER;
+      this.x = Math.max(leftmostPossiblePosition, this.x - this.speed);
     }
+
+    if (this.rightKeyPressed) {
+      const rightmostPossiblePosition = RIGHT_BORDER - this.width;
+      this.x = Math.min(rightmostPossiblePosition, this.x + this.speed);
+    }
+
+    return this.x;
   }
 
-  moveRightIfKeyPressed() {
-    if (this.rightKeyPressed) {
-      const nextPosition = this.x + this.speed,
-            rightmostPossiblePosition = RIGHT_BORDER - this.width;
-
-      this.x = Math.min(rightmostPossiblePosition, nextPosition);
-    }
+  move() {
+    this.x = this.nextPosition;
   }
 
   setControls() {
@@ -461,8 +461,7 @@ class Game {
     ball.bounceOffCeilingIfHit();
     ball.bounceOffWallsIfHit();
     ball.bounceOffPlayerIfHit(player);
-    player.moveLeftIfKeyPressed();
-    player.moveRightIfKeyPressed();
+    player.move();
     ball.move();
     this.removeBrickIfHit();
     this.drawFrame();
