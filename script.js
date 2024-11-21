@@ -3,7 +3,6 @@ import {
   CANVAS_HEIGHT,
   TOP_BORDER,
   RIGHT_BORDER,
-  // BOTTOM_BORDER,
   LEFT_BORDER,
   CANVAS_HORIZONTAL_CENTER,
   CANVAS_VERTICAL_CENTER,
@@ -43,15 +42,6 @@ import {
   LAST_LEVEL,
   COLORS,
 } from './config/game.js';
-
-const START_X = 0,
-      START_Y = 0;
-
-const START_ANGLE = 0,
-      // eslint-disable-next-line no-magic-numbers
-      FULL_CIRCLE = 2 * Math.PI;
-
-const INDENT = 50;
 
 class Brick {
   width;
@@ -230,10 +220,15 @@ class Ball {
 
   draw(color, x, y, r) {
     const { ctx } = this;
+
+    const startAngle = 0,
+          // eslint-disable-next-line no-magic-numbers
+          fullCircle = 2 * Math.PI;
+
     ctx.save();
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(x, y, r, START_ANGLE, FULL_CIRCLE, false);
+    ctx.arc(x, y, r, startAngle, fullCircle, false);
     ctx.fill();
     ctx.restore();
   }
@@ -421,8 +416,10 @@ class Game {
   }
 
   static generateRandomPosition() {
+    const indent = 50;
+
     // eslint-disable-next-line no-magic-numbers
-    return Math.random() * (RIGHT_BORDER - 2 * INDENT) + INDENT;
+    return Math.random() * (RIGHT_BORDER - 2 * indent) + indent;
   }
 
   getCurrentLevel() {
@@ -431,7 +428,10 @@ class Game {
   }
 
   clearCanvas() {
-    this.ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
+    const startX = 0,
+          startY = 0;
+
+    this.ctx.clearRect(startX, startY, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 
   drawPlayer() {
