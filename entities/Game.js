@@ -2,6 +2,8 @@ import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
   RIGHT_BORDER,
+  START_X,
+  START_Y,
 } from '../config/canvas.js';
 
 import {
@@ -25,6 +27,7 @@ import {
   LEVELS,
   LAST_LEVEL,
   COLORS,
+  INDENT,
 } from '../config/game.js';
 
 import Brick from './Brick.js';
@@ -178,10 +181,8 @@ class Game {
   }
 
   static generateRandomPosition() {
-    const indent = 50;
-
     // eslint-disable-next-line no-magic-numbers
-    return Math.random() * (RIGHT_BORDER - 2 * indent) + indent;
+    return Math.random() * (RIGHT_BORDER - 2 * INDENT) + INDENT;
   }
 
   getCurrentLevel() {
@@ -190,10 +191,7 @@ class Game {
   }
 
   clearCanvas() {
-    const startX = 0,
-          startY = 0;
-
-    this.ctx.clearRect(startX, startY, CANVAS_WIDTH, CANVAS_HEIGHT);
+    this.ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 
   drawPlayer() {

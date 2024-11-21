@@ -54,6 +54,8 @@ const COLORS = [
   'aqua',
 ];
 
+const INDENT = 50;
+
 export {
   DELAY,
   BASE_REWARD,
@@ -64,4 +66,5 @@ export {
   LEVELS,
   LAST_LEVEL,
   COLORS,
+  INDENT,
 };
