@@ -6,8 +6,8 @@ import {
 } from './config/canvas.js';
 
 import {
-  BALL_COLOR,
-  BALL_RADIUS,
+  COLOR as BALL_COLOR,
+  RADIUS as BALL_RADIUS,
   SPEED,
 } from './config/ball.js';
 

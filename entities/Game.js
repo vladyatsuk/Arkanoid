@@ -12,8 +12,8 @@ import {
 } from '../config/brick.js';
 
 import {
-  START_BALL_POS_Y,
-  BALL_COLOR,
+  START_POS_Y as START_BALL_POS_Y,
+  COLOR as BALL_COLOR,
 } from '../config/ball.js';
 import {
   START_PLAYER_POS_X,

@@ -7,6 +7,8 @@ import {
 import {
   BOOST,
   SPEED,
+  START_ANGLE,
+  FULL_CIRCLE,
 } from '../config/ball.js';
 
 class Ball {
@@ -44,15 +46,10 @@ class Ball {
 
   draw() {
     const { ctx } = this;
-
-    const startAngle = 0,
-          // eslint-disable-next-line no-magic-numbers
-          fullCircle = 2 * Math.PI;
-
     ctx.save();
     ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, startAngle, fullCircle, false);
+    ctx.arc(this.x, this.y, this.r, START_ANGLE, FULL_CIRCLE, false);
     ctx.fill();
     ctx.restore();
   }
