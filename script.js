@@ -1,7 +1,48 @@
-const CANVAS_WIDTH = 600,
-      CANVAS_HEIGHT = 600;
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  TOP_BORDER,
+  RIGHT_BORDER,
+  // BOTTOM_BORDER,
+  LEFT_BORDER,
+  CANVAS_HORIZONTAL_CENTER,
+  CANVAS_VERTICAL_CENTER,
+} from './config/canvas.js';
 
-const DELAY = 1;
+import {
+  BALL_RADIUS,
+  SPEED,
+  BOOST,
+  START_BALL_POS_Y,
+  BALL_COLOR,
+} from './config/ball.js';
+
+import {
+  PLAYER_WIDTH,
+  PLAYER_HEIGHT,
+  START_PLAYER_POS_X,
+  START_PLAYER_POS_Y,
+  PLAYER_COLOR,
+} from './config/player.js';
+
+import {
+  BRICK_WIDTH,
+  BRICK_HEIGHT,
+  BRICK_X_OFFSET,
+  BRICK_Y_OFFSET,
+} from './config/brick.js';
+
+import {
+  DELAY,
+  BASE_REWARD,
+  START_BRICKS,
+  START_SCORE,
+  START_BEST_SCORE,
+  START_LEVEL_INDEX,
+  LEVELS,
+  LAST_LEVEL,
+  COLORS,
+} from './config/game.js';
 
 const START_X = 0,
       START_Y = 0;
@@ -10,96 +51,7 @@ const START_ANGLE = 0,
       // eslint-disable-next-line no-magic-numbers
       FULL_CIRCLE = 2 * Math.PI;
 
-const BALL_RADIUS = 10;
-
-const PLAYER_WIDTH = 100,
-      PLAYER_HEIGHT = 20;
-
-const TOP_BORDER = 0,
-      RIGHT_BORDER = CANVAS_WIDTH,
-      BOTTOM_BORDER = CANVAS_HEIGHT,
-      LEFT_BORDER = 0;
-
-const BASE_REWARD = 100;
-
-const SPEED = 1.5,
-      BOOST = 5,
-      INDENT = 50;
-
-// eslint-disable-next-line no-magic-numbers
-const CANVAS_HORIZONTAL_CENTER = CANVAS_WIDTH / 2,
-      // eslint-disable-next-line no-magic-numbers
-      CANVAS_VERTICAL_CENTER = CANVAS_HEIGHT / 2;
-
-// eslint-disable-next-line no-magic-numbers
-const START_PLAYER_POS_X_OFFSET = -(PLAYER_WIDTH / 2),
-      START_PLAYER_POS_Y_OFFSET = -75,
-      START_BALL_POS_Y_OFFSET = -15;
-
-const START_PLAYER_POS_X = CANVAS_HORIZONTAL_CENTER + START_PLAYER_POS_X_OFFSET,
-      START_PLAYER_POS_Y = BOTTOM_BORDER + START_PLAYER_POS_Y_OFFSET,
-      START_BALL_POS_Y = START_PLAYER_POS_Y + START_BALL_POS_Y_OFFSET;
-
-const START_BRICKS = [],
-      START_SCORE = 0,
-      START_BEST_SCORE = 0,
-      START_LEVEL_INDEX = 0;
-
-/* eslint-disable no-magic-numbers */
-const LEVELS = [
-  [
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-  ],
-  [
-    [0, 1, 1, 0, 0, 1, 1, 0],
-    [0, 1, 1, 0, 0, 1, 1, 0],
-    [0, 1, 1, 0, 0, 1, 1, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-  ],
-  [
-    [0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0],
-    [0, 1, 0, 1, 1, 0, 1, 0],
-    [1, 0, 1, 0, 0, 1, 0, 1],
-    [1, 0, 1, 0, 0, 1, 0, 1],
-    [0, 1, 0, 1, 1, 0, 1, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
-  ],
-];
-/* eslint-enable no-magic-numbers */
-
-const LAST_LEVEL = LEVELS.length;
-
-const COLORS = [
-  'silver',
-  'maroon',
-  'yellow',
-  'purple',
-  'lime',
-  'navy',
-  'teal',
-  'aqua',
-];
-
-const PLAYER_COLOR = 'red';
-const BALL_COLOR = 'red';
-
-const BRICK_WIDTH = 50,
-      BRICK_HEIGHT = 25,
-      BRICK_X_OFFSET = 100,
-      BRICK_Y_OFFSET = 100;
+const INDENT = 50;
 
 class Brick {
   width;
