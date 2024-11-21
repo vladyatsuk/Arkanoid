@@ -1,9 +1,12 @@
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
+  CANVAS_HORIZONTAL_CENTER,
+  CANVAS_VERTICAL_CENTER,
 } from './config/canvas.js';
 
 import {
+  BALL_COLOR,
   BALL_RADIUS,
   SPEED,
 } from './config/ball.js';
@@ -33,7 +36,15 @@ const main = () => {
         bestScoreLabelElement = document.getElementById('bestScore'),
         headerElement = document.getElementById('header');
 
-  const ball = new Ball({ ctx: canvasCtx, r: BALL_RADIUS }),
+  const ball = new Ball({
+          ctx: canvasCtx,
+          color: BALL_COLOR,
+          x: CANVAS_HORIZONTAL_CENTER,
+          y: CANVAS_VERTICAL_CENTER,
+          r: BALL_RADIUS,
+          speedX: 0,
+          speedY: 0,
+        }),
         player = new Player({
           ctx: canvasCtx,
           header: headerElement,

@@ -1,6 +1,4 @@
 import {
-  CANVAS_HORIZONTAL_CENTER,
-  CANVAS_VERTICAL_CENTER,
   TOP_BORDER,
   RIGHT_BORDER,
   LEFT_BORDER,
@@ -12,14 +10,14 @@ import {
 } from '../config/ball.js';
 
 class Ball {
-  x = CANVAS_HORIZONTAL_CENTER;
-  y = CANVAS_VERTICAL_CENTER;
-  speedX = 0;
-  speedY = 0;
-
-  constructor({ ctx, r }) {
+  constructor({ ctx, color, x, y, r, speedX, speedY }) {
     this.ctx = ctx;
+    this.color = color;
+    this.x = x;
+    this.y = y;
     this.r = r;
+    this.speedX = speedX;
+    this.speedY = speedY;
   }
 
   get top() {
@@ -38,7 +36,7 @@ class Ball {
     return this.x - this.r;
   }
 
-  draw(color, x, y, r) {
+  draw() {
     const { ctx } = this;
 
     const startAngle = 0,
@@ -46,9 +44,9 @@ class Ball {
           fullCircle = 2 * Math.PI;
 
     ctx.save();
-    ctx.fillStyle = color;
+    ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.arc(x, y, r, startAngle, fullCircle, false);
+    ctx.arc(this.x, this.y, this.r, startAngle, fullCircle, false);
     ctx.fill();
     ctx.restore();
   }
