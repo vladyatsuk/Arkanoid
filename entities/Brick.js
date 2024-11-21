@@ -1,19 +1,13 @@
-import {
-  BRICK_WIDTH,
-  BRICK_HEIGHT,
-} from '../config/brick.js';
-
 class Brick {
-  width;
-  height;
+  active = true;
 
-  constructor({ x, y, color }) {
-    this.active = true;
+  constructor({ ctx, color, x, y, width, height }) {
+    this.ctx = ctx;
+    this.color = color;
     this.x = x;
     this.y = y;
-    this.color = color;
-    this.width = BRICK_WIDTH;
-    this.height = BRICK_HEIGHT;
+    this.width = width;
+    this.height = height;
   }
 
   get top() {
@@ -32,11 +26,12 @@ class Brick {
     return this.x;
   }
 
-  draw(ctx, color, x, y, width, height) {
+  draw() {
+    const { ctx } = this;
     ctx.save();
-    ctx.fillStyle = color;
+    ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.rect(x, y, width, height);
+    ctx.rect(this.x, this.y, this.width, this.height);
     ctx.fill();
     ctx.stroke();
     ctx.restore();

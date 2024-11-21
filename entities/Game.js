@@ -104,9 +104,12 @@ class Game {
       for (let x = 0; x < level.length; x++) {
         if (level[y][x]) {
           this.bricks.push(new Brick({
+            ctx: this.ctx,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
             x: BRICK_X_OFFSET + x * BRICK_WIDTH,
             y: BRICK_Y_OFFSET + y * BRICK_HEIGHT,
-            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+            width: BRICK_WIDTH,
+            height: BRICK_HEIGHT,
           }));
         }
       }
