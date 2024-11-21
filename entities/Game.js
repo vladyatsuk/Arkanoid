@@ -13,14 +13,8 @@ import {
   BRICK_Y_OFFSET,
 } from '../config/brick.js';
 
-import {
-  START_POS_Y as START_BALL_POS_Y,
-  COLOR as BALL_COLOR,
-} from '../config/ball.js';
-import {
-  START_PLAYER_POS_X,
-  PLAYER_COLOR,
-} from '../config/player.js';
+import { START_POS_Y as START_BALL_POS_Y } from '../config/ball.js';
+import { START_PLAYER_POS_X } from '../config/player.js';
 
 import {
   BASE_REWARD,
@@ -250,7 +244,7 @@ class Game {
   drawPlayer() {
     const { player } = this;
     player.draw(
-      PLAYER_COLOR,
+      player.color,
       player.x,
       player.y,
       player.width,
@@ -260,7 +254,7 @@ class Game {
 
   drawBall() {
     const { ball } = this;
-    ball.draw(BALL_COLOR, ball.x, ball.y, ball.r);
+    ball.draw(ball.color, ball.x, ball.y, ball.r);
   }
 
   drawBricks() {
