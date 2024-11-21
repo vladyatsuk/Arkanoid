@@ -14,6 +14,9 @@ import {
 import {
   PLAYER_WIDTH,
   PLAYER_HEIGHT,
+  PLAYER_COLOR,
+  START_PLAYER_POS_X,
+  START_PLAYER_POS_Y,
 } from './config/player.js';
 
 import {
@@ -47,7 +50,10 @@ const main = () => {
         }),
         player = new Player({
           ctx: canvasCtx,
+          color: PLAYER_COLOR,
           header: headerElement,
+          x: START_PLAYER_POS_X,
+          y: START_PLAYER_POS_Y,
           width: PLAYER_WIDTH,
           height: PLAYER_HEIGHT,
           speed: SPEED,

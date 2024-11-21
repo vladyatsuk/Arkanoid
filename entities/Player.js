@@ -3,25 +3,21 @@ import {
   LEFT_BORDER,
 } from '../config/canvas.js';
 
-import {
-  START_PLAYER_POS_X,
-  START_PLAYER_POS_Y,
-} from '../config/player.js';
-
 class Player {
-  x = START_PLAYER_POS_X;
-  y = START_PLAYER_POS_Y;
-  leftKey = false;
-  rightKey = false;
-  canLaunchBall = true;
-
-  constructor({ ctx, header, width, height, speed, ball }) {
+  constructor({ ctx, color, header, x, y, width, height, speed, ball }) {
     this.ctx = ctx;
+    this.color = color;
     this.header = header;
+    this.x = x;
+    this.y = y;
     this.width = width;
     this.height = height;
     this.speed = speed;
     this.ball = ball;
+
+    this.leftKey = false;
+    this.rightKey = false;
+    this.canLaunchBall = true;
   }
 
   get top() {
@@ -40,12 +36,12 @@ class Player {
     return this.x;
   }
 
-  draw(color, x, y, width, height) {
+  draw() {
     const { ctx } = this;
     ctx.save();
-    ctx.fillStyle = color;
+    ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.rect(x, y, width, height);
+    ctx.rect(this.x, this.y, this.width, this.height);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
