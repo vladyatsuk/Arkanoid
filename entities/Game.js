@@ -118,7 +118,23 @@ class Game {
   get isFullLevelScore() {
     const { bricks } = this;
 
-    return this.score === BASE_REWARD * this.getCurrentLevel() * bricks.length;
+    return this.score === BASE_REWARD * this.currentLevel * bricks.length;
+  }
+
+  get levelData() {
+    return LEVELS[this.levelIndex];
+  }
+
+  incrementLevelIndex() {
+    this.levelIndex += 1;
+  }
+
+  isLastLevel() {
+    return this.levelIndex === LAST_LEVEL;
+  }
+
+  resetLevelIndex() {
+    this.levelIndex = 0;
   }
 
   resetScore() {
@@ -164,20 +180,20 @@ class Game {
     const { header } = this;
 
     if (this.isFullLevelScore) {
+      header.innerHTML = `You won level ${this.currentLevel} :)`;
       this.resetScore();
-      this.levelIndex += 1;
-      header.innerHTML = `You won level ${this.levelIndex} :)`;
+      this.incrementLevelIndex();
 
-      if (this.levelIndex === LAST_LEVEL) {
+      if (this.isLastLevel) {
         header.innerHTML = 'You won the last level :)';
-        this.levelIndex = 0;
+        this.resetLevelIndex();
       }
 
       this.reset();
     }
 
     if (this.isLoss()) {
-      this.levelIndex = 0;
+      this.resetLevelIndex();
       header.innerHTML = 'You lost :(';
       this.reset();
     }
@@ -188,7 +204,7 @@ class Game {
   }
 
   init() {
-    const level = LEVELS[this.levelIndex];
+    const level = this.levelData;
     this.bricks = [];
     this.player.x = START_PLAYER_POS_X;
     this.ball.x = Game.generateRandomPosition();
@@ -257,7 +273,7 @@ class Game {
     return Math.random() * (RIGHT_BORDER - 2 * INDENT) + INDENT;
   }
 
-  getCurrentLevel() {
+  get currentLevel() {
     // eslint-disable-next-line no-magic-numbers
     return this.levelIndex + 1;
   }
