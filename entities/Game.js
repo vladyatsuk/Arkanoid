@@ -115,11 +115,33 @@ class Game {
     });
   }
 
-  drawScore() {
-    const { score, scoreLabel, bestScoreLabel } = this;
+  get isFullLevelScore() {
+    const { bricks } = this;
+
+    return this.score === BASE_REWARD * this.getCurrentLevel() * bricks.length;
+  }
+
+  resetScore() {
+    this.score = 0;
+  }
+
+  increaseScore() {
+    this.score += BASE_REWARD * this.currentLevel;
+  }
+
+  updateBestScore() {
+    const { score } = this;
 
     if (score > this.bestScore) this.bestScore = score;
+  }
+
+  drawScore() {
+    const { score, scoreLabel } = this;
     scoreLabel.innerHTML = `Score: ${score}`;
+  }
+
+  drawBestScore() {
+    const { bestScoreLabel } = this;
     bestScoreLabel.innerHTML = `Best score: ${this.bestScore}`;
   }
 
@@ -129,6 +151,7 @@ class Game {
     this.drawBricks();
     this.drawPlayer();
     this.drawScore();
+    this.drawBestScore();
   }
 
   isLoss() {
@@ -138,10 +161,10 @@ class Game {
   }
 
   showGameStatus() {
-    const { header, bricks } = this;
+    const { header } = this;
 
-    if (this.score === BASE_REWARD * this.getCurrentLevel() * bricks.length) {
-      this.score = 0;
+    if (this.isFullLevelScore) {
+      this.resetScore();
       this.levelIndex += 1;
       header.innerHTML = `You won level ${this.levelIndex} :)`;
 
@@ -159,7 +182,9 @@ class Game {
       this.reset();
     }
 
+    this.updateBestScore();
     this.drawScore();
+    this.drawBestScore();
   }
 
   init() {
@@ -189,7 +214,7 @@ class Game {
 
   reset() {
     const { ball, player } = this;
-    this.score = 0;
+    this.resetScore();
     ball.speedX = 0;
     ball.speedY = 0;
     player.x = START_PLAYER_POS_X;
@@ -205,7 +230,7 @@ class Game {
       const brick = bricks[i];
 
       if (brick.active && ball.hitBrick(brick)) {
-        this.score += BASE_REWARD * this.getCurrentLevel();
+        this.increaseScore();
         brick.active = false;
         ball.speedY *= -1;
         break;
