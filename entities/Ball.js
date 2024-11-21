@@ -70,10 +70,6 @@ class Ball {
     return this.top + this.speedY <= TOP_BORDER;
   }
 
-  belowPlayer(player) {
-    return this.top > player.bottom;
-  }
-
   hitPlayer(player) {
     return this.bottom >= player.top &&
       this.x >= player.left &&
@@ -87,26 +83,20 @@ class Ball {
       this.top < brick.bottom;
   }
 
-  bounceOffCeilingIfHit() {
-    if (this.hitCeiling) {
-      this.speedY *= -1;
-      this.y += BOOST;
-    }
+  bounceOffCeiling() {
+    this.speedY *= -1;
+    this.y += BOOST;
   }
 
-  bounceOffWallsIfHit() {
-    if (this.hitWalls) {
-      this.speedX *= -1;
-    }
+  bounceOffWalls() {
+    this.speedX *= -1;
   }
 
-  bounceOffPlayerIfHit(player) {
-    if (this.hitPlayer(player)) {
-      this.speedY *= -1;
-      this.y -= BOOST;
-      if (player.leftKeyPressed) this.speedX = -SPEED;
-      if (player.rightKeyPressed) this.speedX = SPEED;
-    }
+  bounceOffPlayer(player) {
+    this.speedY *= -1;
+    this.y -= BOOST;
+    if (player.leftKeyPressed) this.speedX = -SPEED;
+    if (player.rightKeyPressed) this.speedX = SPEED;
   }
 }
 

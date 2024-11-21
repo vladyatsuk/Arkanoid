@@ -87,7 +87,7 @@ class Game {
   isLoss() {
     const { ball, player } = this;
 
-    return ball.belowPlayer(player);
+    return ball.top > player.bottom;
   }
 
   showGameStatus() {
@@ -170,9 +170,9 @@ class Game {
     const { ball, player } = this;
 
     if (player.canLaunchBall) player.x = START_PLAYER_POS_X;
-    ball.bounceOffCeilingIfHit();
-    ball.bounceOffWallsIfHit();
-    ball.bounceOffPlayerIfHit(player);
+    if (ball.hitCeiling) ball.bounceOffCeiling();
+    if (ball.hitWalls) ball.bounceOffWalls();
+    if (ball.hitPlayer(player)) ball.bounceOffPlayer(player);
     player.move();
     ball.move();
     this.removeBrickIfHit();
