@@ -1,5 +1,4 @@
 class Brick {
-  ctx;
   color;
   x;
   y;
@@ -7,8 +6,7 @@ class Brick {
   height;
   active = true;
 
-  constructor({ ctx, color, x, y, width, height }) {
-    this.ctx = ctx;
+  constructor({ color, x, y, width, height }) {
     this.color = color;
     this.x = x;
     this.y = y;
@@ -30,17 +28,6 @@ class Brick {
 
   get left() {
     return this.x;
-  }
-
-  draw() {
-    const { ctx } = this;
-    ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
   }
 }
 

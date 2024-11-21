@@ -7,12 +7,9 @@ import {
 import {
   BOOST,
   SPEED,
-  START_ANGLE,
-  FULL_CIRCLE,
 } from '../config/ball.js';
 
 class Ball {
-  ctx;
   color;
   x;
   y;
@@ -20,8 +17,7 @@ class Ball {
   speedX = 0;
   speedY = 0;
 
-  constructor({ ctx, color, x, y, r }) {
-    this.ctx = ctx;
+  constructor({ color, x, y, r }) {
     this.color = color;
     this.x = x;
     this.y = y;
@@ -42,16 +38,6 @@ class Ball {
 
   get left() {
     return this.x - this.r;
-  }
-
-  draw() {
-    const { ctx } = this;
-    ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, START_ANGLE, FULL_CIRCLE, false);
-    ctx.fill();
-    ctx.restore();
   }
 
   move() {

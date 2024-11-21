@@ -27,6 +27,7 @@ import {
   START_LEVEL_INDEX,
 } from './config/game.js';
 
+import Renderer from './entities/Renderer.js';
 import Ball from './entities/Ball.js';
 import Player from './entities/Player.js';
 import Game from './entities/Game.js';
@@ -39,15 +40,18 @@ const main = () => {
         bestScoreLabelElement = document.getElementById('bestScore'),
         headerElement = document.getElementById('header');
 
-  const ball = new Ball({
-          ctx: canvasCtx,
+  const renderer = new Renderer(
+          canvasCtx,
+          scoreLabelElement,
+          bestScoreLabelElement,
+        ),
+        ball = new Ball({
           color: BALL_COLOR,
           x: CANVAS_HORIZONTAL_CENTER,
           y: CANVAS_VERTICAL_CENTER,
           r: BALL_RADIUS,
         }),
         player = new Player({
-          ctx: canvasCtx,
           color: PLAYER_COLOR,
           header: headerElement,
           x: START_PLAYER_POS_X,
@@ -58,10 +62,8 @@ const main = () => {
           ball,
         }),
         game = new Game({
-          ctx: canvasCtx,
+          renderer,
           header: headerElement,
-          scoreLabel: scoreLabelElement,
-          bestScoreLabel: bestScoreLabelElement,
           score: START_SCORE,
           bestScore: START_BEST_SCORE,
           levelIndex: START_LEVEL_INDEX,

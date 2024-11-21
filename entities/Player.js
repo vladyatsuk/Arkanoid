@@ -4,7 +4,6 @@ import {
 } from '../config/canvas.js';
 
 class Player {
-  ctx;
   color;
   header;
   x;
@@ -17,8 +16,7 @@ class Player {
   rightKey = false;
   canLaunchBall = true;
 
-  constructor({ ctx, color, header, x, y, width, height, speed, ball }) {
-    this.ctx = ctx;
+  constructor({ color, header, x, y, width, height, speed, ball }) {
     this.color = color;
     this.header = header;
     this.x = x;
@@ -43,17 +41,6 @@ class Player {
 
   get left() {
     return this.x;
-  }
-
-  draw() {
-    const { ctx } = this;
-    ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
   }
 
   get leftKeyPressed() {

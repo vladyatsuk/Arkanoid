@@ -1,10 +1,4 @@
-import {
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-  RIGHT_BORDER,
-  START_X,
-  START_Y,
-} from '../config/canvas.js';
+import { RIGHT_BORDER } from '../config/canvas.js';
 
 import {
   BRICK_WIDTH,
@@ -27,10 +21,8 @@ import {
 import Brick from './Brick.js';
 
 class Game {
-  ctx;
+  renderer;
   header;
-  scoreLabel;
-  bestScoreLabel;
   score;
   bestScore;
   levelIndex;
@@ -39,10 +31,8 @@ class Game {
   bricks;
 
   constructor({
-    ctx,
+    renderer,
     header,
-    scoreLabel,
-    bestScoreLabel,
     score,
     bestScore,
     levelIndex,
@@ -50,10 +40,8 @@ class Game {
     player,
     bricks,
   }) {
-    this.ctx = ctx;
+    this.renderer = renderer;
     this.header = header;
-    this.scoreLabel = scoreLabel;
-    this.bestScoreLabel = bestScoreLabel;
     this.score = score;
     this.bestScore = bestScore;
     this.levelIndex = levelIndex;
@@ -151,25 +139,6 @@ class Game {
     if (score > this.bestScore) this.bestScore = score;
   }
 
-  drawScore() {
-    const { score, scoreLabel } = this;
-    scoreLabel.innerHTML = `Score: ${score}`;
-  }
-
-  drawBestScore() {
-    const { bestScoreLabel } = this;
-    bestScoreLabel.innerHTML = `Best score: ${this.bestScore}`;
-  }
-
-  drawFrame() {
-    this.clearCanvas();
-    this.drawBall();
-    this.drawBricks();
-    this.drawPlayer();
-    this.drawScore();
-    this.drawBestScore();
-  }
-
   isLoss() {
     const { ball, player } = this;
 
@@ -177,7 +146,7 @@ class Game {
   }
 
   showGameStatus() {
-    const { header } = this;
+    const { header, renderer } = this;
 
     if (this.isFullLevelScore) {
       header.innerHTML = `You won level ${this.currentLevel} :)`;
@@ -199,8 +168,7 @@ class Game {
     }
 
     this.updateBestScore();
-    this.drawScore();
-    this.drawBestScore();
+    renderer.drawScores(this.score, this.bestScore);
   }
 
   init() {
@@ -214,7 +182,6 @@ class Game {
       for (let x = 0; x < level.length; x++) {
         if (level[y][x]) {
           this.bricks.push(new Brick({
-            ctx: this.ctx,
             color: COLORS[Math.floor(Math.random() * COLORS.length)],
             x: BRICK_X_OFFSET + x * BRICK_WIDTH,
             y: BRICK_Y_OFFSET + y * BRICK_HEIGHT,
@@ -255,7 +222,7 @@ class Game {
   }
 
   playGame() {
-    const { ball, player } = this;
+    const { ball, bricks, player, renderer } = this;
 
     if (player.canLaunchBall) player.x = START_PLAYER_POS_X;
     if (ball.hitCeiling) ball.bounceOffCeiling();
@@ -264,7 +231,8 @@ class Game {
     player.move();
     ball.move();
     this.removeBrickIfHit();
-    this.drawFrame();
+    renderer.drawFrame({ ball, bricks, player });
+    renderer.drawScores(this.score, this.bestScore);
     this.showGameStatus();
   }
 
@@ -276,45 +244,6 @@ class Game {
   get currentLevel() {
     // eslint-disable-next-line no-magic-numbers
     return this.levelIndex + 1;
-  }
-
-  clearCanvas() {
-    this.ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
-  }
-
-  drawPlayer() {
-    const { player } = this;
-    player.draw(
-      player.color,
-      player.x,
-      player.y,
-      player.width,
-      player.height,
-    );
-  }
-
-  drawBall() {
-    const { ball } = this;
-    ball.draw(ball.color, ball.x, ball.y, ball.r);
-  }
-
-  drawBricks() {
-    const { bricks } = this;
-
-    for (let i = 0; i < bricks.length; i++) {
-      const brick = bricks[i];
-
-      if (brick.active) {
-        brick.draw(
-          this.ctx,
-          brick.color,
-          brick.x,
-          brick.y,
-          brick.width,
-          brick.height,
-        );
-      }
-    }
   }
 }
 
