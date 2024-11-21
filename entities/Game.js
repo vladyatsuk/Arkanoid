@@ -68,6 +68,59 @@ class Game {
     this.bricks = bricks;
   }
 
+  handleKeyDown(event) {
+    const { code } = event;
+    const { player } = this;
+
+    if (code === 'KeyA' || code === 'ArrowLeft') {
+      player.leftKey = true;
+    }
+
+    if (code === 'KeyD' || code === 'ArrowRight') {
+      player.rightKey = true;
+    }
+  }
+
+  handleKeyUp(event) {
+    const { code } = event;
+    const { player } = this;
+
+    if (code === 'KeyA' || code === 'ArrowLeft') {
+      player.leftKey = false;
+    }
+
+    if (code === 'KeyD' || code === 'ArrowRight') {
+      player.rightKey = false;
+    }
+  }
+
+  handleGameStartOnKeys(event) {
+    const { code } = event;
+    const { player } = this;
+
+    if (code === 'KeyS' || code === 'ArrowDown') {
+      if (player.canLaunchBall) {
+        const { header, ball } = this;
+        header.innerHTML = 'Break all the bricks!';
+        ball.speedX = player.speed;
+        ball.speedY = player.speed;
+        player.canLaunchBall = false;
+      }
+    }
+  }
+
+  setControls() {
+    document.addEventListener('keydown', (event) => {
+      this.handleKeyDown(event);
+    });
+    document.addEventListener('keyup', (event) => {
+      this.handleKeyUp(event);
+    });
+    document.addEventListener('keydown', (event) => {
+      this.handleGameStartOnKeys(event);
+    });
+  }
+
   drawScore() {
     const { score, scoreLabel, bestScoreLabel } = this;
 
@@ -137,7 +190,7 @@ class Game {
       }
     }
 
-    this.player.setControls();
+    this.setControls();
   }
 
   reset() {

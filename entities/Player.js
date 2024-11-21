@@ -81,44 +81,6 @@ class Player {
   move() {
     this.x = this.nextPosition;
   }
-
-  setControls() {
-    document.addEventListener('keydown', (event) => {
-      const { code } = event;
-
-      if (code === 'KeyA' || code === 'ArrowLeft') {
-        this.leftKey = true;
-      }
-
-      if (code === 'KeyD' || code === 'ArrowRight') {
-        this.rightKey = true;
-      }
-    });
-    document.addEventListener('keyup', (event) => {
-      const { code } = event;
-
-      if (code === 'KeyA' || code === 'ArrowLeft') {
-        this.leftKey = false;
-      }
-
-      if (code === 'KeyD' || code === 'ArrowRight') {
-        this.rightKey = false;
-      }
-    });
-    document.addEventListener('keydown', (event) => {
-      const { code } = event;
-
-      if (code === 'KeyS' || code === 'ArrowDown') {
-        if (this.canLaunchBall) {
-          const { header, ball } = this;
-          header.innerHTML = 'Break all the bricks!';
-          ball.speedX = this.speed;
-          ball.speedY = this.speed;
-          this.canLaunchBall = false;
-        }
-      }
-    });
-  }
 }
 
 export default Player;
