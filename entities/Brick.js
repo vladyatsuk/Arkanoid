@@ -1,4 +1,10 @@
 class Brick {
+  ctx;
+  color;
+  x;
+  y;
+  width;
+  height;
   active = true;
 
   constructor({ ctx, color, x, y, width, height }) {

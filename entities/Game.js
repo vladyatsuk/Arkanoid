@@ -30,9 +30,28 @@ import {
 import Brick from './Brick.js';
 
 class Game {
+  ctx;
+  header;
+  scoreLabel;
+  bestScoreLabel;
+  score;
+  bestScore;
+  levelIndex;
+  ball;
+  player;
+  bricks;
+
   constructor({
-    ctx, header, scoreLabel, bestScoreLabel, score, bestScore, levelIndex,
-    ball, player, bricks,
+    ctx,
+    header,
+    scoreLabel,
+    bestScoreLabel,
+    score,
+    bestScore,
+    levelIndex,
+    ball,
+    player,
+    bricks,
   }) {
     this.ctx = ctx;
     this.header = header;

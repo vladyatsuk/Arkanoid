@@ -45,8 +45,6 @@ const main = () => {
           x: CANVAS_HORIZONTAL_CENTER,
           y: CANVAS_VERTICAL_CENTER,
           r: BALL_RADIUS,
-          speedX: 0,
-          speedY: 0,
         }),
         player = new Player({
           ctx: canvasCtx,

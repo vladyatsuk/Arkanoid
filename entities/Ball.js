@@ -10,14 +10,20 @@ import {
 } from '../config/ball.js';
 
 class Ball {
-  constructor({ ctx, color, x, y, r, speedX, speedY }) {
+  ctx;
+  color;
+  x;
+  y;
+  r;
+  speedX = 0;
+  speedY = 0;
+
+  constructor({ ctx, color, x, y, r }) {
     this.ctx = ctx;
     this.color = color;
     this.x = x;
     this.y = y;
     this.r = r;
-    this.speedX = speedX;
-    this.speedY = speedY;
   }
 
   get top() {

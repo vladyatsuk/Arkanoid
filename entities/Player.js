@@ -4,6 +4,19 @@ import {
 } from '../config/canvas.js';
 
 class Player {
+  ctx;
+  color;
+  header;
+  x;
+  y;
+  width;
+  height;
+  speed;
+  ball;
+  leftKey = false;
+  rightKey = false;
+  canLaunchBall = true;
+
   constructor({ ctx, color, header, x, y, width, height, speed, ball }) {
     this.ctx = ctx;
     this.color = color;
@@ -14,10 +27,6 @@ class Player {
     this.height = height;
     this.speed = speed;
     this.ball = ball;
-
-    this.leftKey = false;
-    this.rightKey = false;
-    this.canLaunchBall = true;
   }
 
   get top() {
