@@ -22,7 +22,6 @@ import Brick from './Brick.js';
 
 class Game {
   renderer;
-  header;
   score;
   bestScore;
   levelIndex;
@@ -32,7 +31,6 @@ class Game {
 
   constructor({
     renderer,
-    header,
     score,
     bestScore,
     levelIndex,
@@ -41,7 +39,6 @@ class Game {
     bricks,
   }) {
     this.renderer = renderer;
-    this.header = header;
     this.score = score;
     this.bestScore = bestScore;
     this.levelIndex = levelIndex;
@@ -82,8 +79,8 @@ class Game {
 
     if (code === 'KeyS' || code === 'ArrowDown') {
       if (player.canLaunchBall) {
-        const { header, ball } = this;
-        header.innerHTML = 'Break all the bricks!';
+        const { renderer, ball } = this;
+        renderer.drawHeader('Break all the bricks!');
         ball.speedX = player.speed;
         ball.speedY = player.speed;
         player.canLaunchBall = false;
@@ -146,15 +143,15 @@ class Game {
   }
 
   showGameStatus() {
-    const { header, renderer } = this;
+    const { renderer } = this;
 
     if (this.isFullLevelScore) {
-      header.innerHTML = `You won level ${this.currentLevel} :)`;
+      renderer.drawHeader(`You won level ${this.currentLevel} :)`);
       this.resetScore();
       this.incrementLevelIndex();
 
       if (this.isLastLevel) {
-        header.innerHTML = 'You won the last level :)';
+        renderer.drawHeader('You won the last level :)');
         this.resetLevelIndex();
       }
 
@@ -163,7 +160,7 @@ class Game {
 
     if (this.isLoss()) {
       this.resetLevelIndex();
-      header.innerHTML = 'You lost :(';
+      renderer.drawHeader('You lost :(');
       this.reset();
     }
 

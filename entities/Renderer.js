@@ -13,11 +13,13 @@ class Renderer {
   ctx;
   scoreLabel;
   bestScoreLabel;
+  header;
 
-  constructor(ctx, scoreLabel, bestScoreLabel) {
+  constructor(ctx, scoreLabel, bestScoreLabel, header) {
     this.ctx = ctx;
     this.scoreLabel = scoreLabel;
     this.bestScoreLabel = bestScoreLabel;
+    this.header = header;
   }
 
   clearCanvas() {
@@ -84,6 +86,10 @@ class Renderer {
   drawScores(score, bestScore) {
     this.drawScore(score);
     this.drawBestScore(bestScore);
+  }
+
+  drawHeader(message) {
+    this.header.innerHTML = message;
   }
 }
 

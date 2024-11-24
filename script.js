@@ -44,6 +44,7 @@ const main = () => {
           canvasCtx,
           scoreLabelElement,
           bestScoreLabelElement,
+          headerElement,
         ),
         ball = new Ball({
           color: BALL_COLOR,
@@ -63,7 +64,6 @@ const main = () => {
         }),
         game = new Game({
           renderer,
-          header: headerElement,
           score: START_SCORE,
           bestScore: START_BEST_SCORE,
           levelIndex: START_LEVEL_INDEX,
