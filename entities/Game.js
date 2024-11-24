@@ -114,7 +114,7 @@ class Game {
     this.levelIndex += 1;
   }
 
-  isLastLevel() {
+  get isLastLevel() {
     return this.levelIndex === LAST_LEVEL;
   }
 
@@ -136,7 +136,7 @@ class Game {
     if (score > this.bestScore) this.bestScore = score;
   }
 
-  isLoss() {
+  get isLoss() {
     const { ball, player } = this;
 
     return ball.top > player.bottom;
@@ -158,7 +158,7 @@ class Game {
       this.reset();
     }
 
-    if (this.isLoss()) {
+    if (this.isLoss) {
       this.resetLevelIndex();
       renderer.drawHeader('You lost :(');
       this.reset();
