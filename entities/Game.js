@@ -22,6 +22,7 @@ import Brick from './Brick.js';
 import Mover from './Mover.js';
 import CollisionDetector from './CollisionDetector.js';
 import Controls from './Controls.js';
+import BallPhysics from './BallPhysics.js';
 
 class Game {
   renderer;
@@ -171,10 +172,22 @@ class Game {
   playGame() {
     const { ball, bricks, player, renderer } = this;
 
-    if (player.canLaunchBall) player.x = START_PLAYER_POS_X;
-    if (CollisionDetector.hitCeiling(ball)) ball.bounceOffCeiling();
-    if (CollisionDetector.hitWalls(ball)) ball.bounceOffWalls();
-    if (CollisionDetector.hitPlayer(ball, player)) ball.bounceOffPlayer(player);
+    if (player.canLaunchBall) {
+      player.x = START_PLAYER_POS_X;
+    }
+
+    if (CollisionDetector.hitCeiling(ball)) {
+      BallPhysics.bounceOffCeiling(ball);
+    }
+
+    if (CollisionDetector.hitWalls(ball)) {
+      BallPhysics.bounceOffWalls(ball);
+    }
+
+    if (CollisionDetector.hitPlayer(ball, player)) {
+      BallPhysics.bounceOffPlayer(ball, player);
+    }
+
     Mover.movePlayer(player);
     Mover.moveBall(ball);
     this.removeBrickIfHit();
