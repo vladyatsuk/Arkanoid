@@ -1,7 +1,7 @@
 import { RIGHT_BORDER } from '../config/canvas.js';
 import { START_POS_Y as START_BALL_POS_Y } from '../config/ball.js';
 import { START_PLAYER_POS_X } from '../config/player.js';
-import { BASE_REWARD, INDENT } from '../config/game.js';
+import { INDENT } from '../config/game.js';
 
 import Mover from './Mover.js';
 import CollisionDetector from './CollisionDetector.js';
@@ -9,43 +9,23 @@ import Controls from './Controls.js';
 import BallPhysics from './BallPhysics.js';
 import LevelManager from './LevelManager.js';
 import LevelData from './LevelData.js';
+import ScoreSystem from './ScoreSystem.js';
 
 class Game {
   renderer;
-  score;
-  bestScore;
   ball;
   player;
   levelData = new LevelData();
+  scoreSystem = new ScoreSystem();
 
   constructor({
     renderer,
-    score,
-    bestScore,
     ball,
     player,
   }) {
     this.renderer = renderer;
-    this.score = score;
-    this.bestScore = bestScore;
     this.ball = ball;
     this.player = player;
-  }
-
-  resetScore() {
-    this.score = 0;
-  }
-
-  increaseScore() {
-    const { levelData } = this;
-
-    this.score += BASE_REWARD * levelData.currentLevel;
-  }
-
-  updateBestScore() {
-    const { score } = this;
-
-    if (score > this.bestScore) this.bestScore = score;
   }
 
   get isLoss() {
@@ -55,11 +35,11 @@ class Game {
   }
 
   showGameStatus() {
-    const { renderer, levelData } = this;
+    const { renderer, levelData, scoreSystem } = this;
 
     if (levelData.isLevelDone) {
       renderer.drawHeader(`You won level ${levelData.currentLevel} :)`);
-      this.resetScore();
+      scoreSystem.resetScore();
       LevelManager.incrementLevelIndex(levelData);
 
       if (levelData.isLastLevel) {
@@ -76,8 +56,8 @@ class Game {
       this.reset();
     }
 
-    this.updateBestScore();
-    renderer.drawScores(this.score, this.bestScore);
+    scoreSystem.updateBestScore();
+    renderer.drawScores(scoreSystem.scores);
   }
 
   init() {
@@ -91,8 +71,8 @@ class Game {
   }
 
   reset() {
-    const { ball, player } = this;
-    this.resetScore();
+    const { ball, player, scoreSystem } = this;
+    scoreSystem.resetScore();
     ball.speedX = 0;
     ball.speedY = 0;
     player.x = START_PLAYER_POS_X;
@@ -102,14 +82,14 @@ class Game {
   }
 
   removeBrickIfHit() {
-    const { ball } = this;
-    const { bricks } = this.levelData;
+    const { ball, levelData, scoreSystem } = this;
+    const { bricks, currentLevel } = levelData;
 
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
 
       if (brick.active && CollisionDetector.hitBrick(ball, brick)) {
-        this.increaseScore();
+        scoreSystem.increaseScore(currentLevel);
         brick.active = false;
         ball.speedY *= -1;
         break;
@@ -118,7 +98,7 @@ class Game {
   }
 
   playGame() {
-    const { ball, player, renderer } = this;
+    const { ball, player, renderer, scoreSystem } = this;
     const { bricks } = this.levelData;
 
     if (player.canLaunchBall) {
@@ -141,7 +121,7 @@ class Game {
     Mover.moveBall(ball);
     this.removeBrickIfHit();
     renderer.drawEntities({ ball, bricks, player });
-    renderer.drawScores(this.score, this.bestScore);
+    renderer.drawScores(scoreSystem.scores);
     this.showGameStatus();
   }
 

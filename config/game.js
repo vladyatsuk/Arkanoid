@@ -2,8 +2,6 @@ const DELAY = 1;
 const BASE_REWARD = 100;
 
 const START_BRICKS = [],
-      START_SCORE = 0,
-      START_BEST_SCORE = 0,
       START_LEVEL_INDEX = 0;
 
 /* eslint-disable no-magic-numbers */
@@ -60,8 +58,6 @@ export {
   DELAY,
   BASE_REWARD,
   START_BRICKS,
-  START_SCORE,
-  START_BEST_SCORE,
   START_LEVEL_INDEX,
   LEVELS,
   LAST_LEVEL,

@@ -83,9 +83,9 @@ class Renderer {
     this.#bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
   }
 
-  drawScores(score, bestScore) {
-    this.drawScore(score);
-    this.drawBestScore(bestScore);
+  drawScores({ current, best }) {
+    this.drawScore(current);
+    this.drawBestScore(best);
   }
 
   drawHeader(message) {

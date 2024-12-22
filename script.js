@@ -19,7 +19,7 @@ import {
   START_PLAYER_POS_Y,
 } from './config/player.js';
 
-import { DELAY, START_SCORE, START_BEST_SCORE, } from './config/game.js';
+import { DELAY } from './config/game.js';
 
 import Renderer from './entities/Renderer.js';
 import Ball from './entities/Ball.js';
@@ -58,8 +58,6 @@ const main = () => {
         }),
         game = new Game({
           renderer,
-          score: START_SCORE,
-          bestScore: START_BEST_SCORE,
           ball,
           player,
         });
