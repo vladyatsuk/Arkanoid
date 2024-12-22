@@ -1,7 +1,12 @@
 import { BALL_BOOST, BALL_SPEED_X } from '../constants/ball.js';
 import Controls from './Controls.js';
 
-class BallPhysics {
+class BallEngine {
+  static move(ball) {
+    ball.x += ball.speedX;
+    ball.y += ball.speedY;
+  }
+
   static bounceOffCeiling(ball) {
     ball.speedY *= -1;
     ball.y += BALL_BOOST;
@@ -23,4 +28,4 @@ class BallPhysics {
   }
 }
 
-export default BallPhysics;
+export default BallEngine;

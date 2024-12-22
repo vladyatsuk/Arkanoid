@@ -6,10 +6,10 @@ import { STATES } from '../constants/gameState.js';
 
 import Ball from './Ball.js';
 import Player from './Player.js';
-import Mover from './Mover.js';
+import PlayerEngine from './PlayerEngine.js';
 import CollisionDetector from './CollisionDetector.js';
 import Controls from './Controls.js';
-import BallPhysics from './BallPhysics.js';
+import BallEngine from './BallEngine.js';
 import ScoreManager from './ScoreManager.js';
 import LevelManager from './LevelManager.js';
 import EntityFactory from './EntityFactory.js';
@@ -19,24 +19,28 @@ import GameMessage from './GameMessage.js';
 class Game {
   #levelManager;
   #scoreManager;
-  #gameState = new GameState();
+  #gameState;
   #ball;
   #player;
   #bricks;
   #renderer;
-  #gameMessage = new GameMessage();
+  #gameMessage;
 
   constructor({
     levelManager = new LevelManager(),
     scoreManager = new ScoreManager(),
+    gameState = new GameState(),
     ball = new Ball(),
     player = new Player(),
+    gameMessage = new GameMessage(),
     renderer,
   }) {
     this.#levelManager = levelManager;
     this.#scoreManager = scoreManager;
+    this.#gameState = gameState;
     this.#ball = ball;
     this.#player = player;
+    this.#gameMessage = gameMessage;
     this.#renderer = renderer;
     this.#gameMessage.set('Press \'s\' to play!');
     Controls.setControls(ball, this.#gameState);
@@ -66,15 +70,15 @@ class Game {
     this.#gameMessage.set('Break all the bricks!');
 
     if (CollisionDetector.hitCeiling(ball)) {
-      BallPhysics.bounceOffCeiling(ball);
+      BallEngine.bounceOffCeiling(ball);
     }
 
     if (CollisionDetector.hitWalls(ball)) {
-      BallPhysics.bounceOffWalls(ball);
+      BallEngine.bounceOffWalls(ball);
     }
 
     if (CollisionDetector.hitPlayer(ball, player)) {
-      BallPhysics.bounceOffPlayer(ball);
+      BallEngine.bounceOffPlayer(ball);
     }
 
     for (const brick of bricks) {
@@ -82,13 +86,13 @@ class Game {
         scoreManager.increaseScore(levelManager.currentLevel);
         scoreManager.updateBestScore();
         bricks.delete(brick);
-        BallPhysics.bounceOffBrick(ball);
+        BallEngine.bounceOffBrick(ball);
         break;
       }
     }
 
-    Mover.movePlayer(player);
-    Mover.moveBall(ball);
+    PlayerEngine.move(player);
+    BallEngine.move(ball);
     if (!bricks.size) {
       this.#gameState.transition(STATES.LEVEL_DONE);
     } else if (this.#isLoss) {
