@@ -20,6 +20,7 @@ import {
 
 import Brick from './Brick.js';
 import Mover from './Mover.js';
+import CollisionDetector from './CollisionDetector.js';
 
 class Game {
   renderer;
@@ -210,7 +211,7 @@ class Game {
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
 
-      if (brick.active && ball.hitBrick(brick)) {
+      if (brick.active && CollisionDetector.hitBrick(ball, brick)) {
         this.increaseScore();
         brick.active = false;
         ball.speedY *= -1;
@@ -223,9 +224,9 @@ class Game {
     const { ball, bricks, player, renderer } = this;
 
     if (player.canLaunchBall) player.x = START_PLAYER_POS_X;
-    if (ball.hitCeiling) ball.bounceOffCeiling();
-    if (ball.hitWalls) ball.bounceOffWalls();
-    if (ball.hitPlayer(player)) ball.bounceOffPlayer(player);
+    if (CollisionDetector.hitCeiling(ball)) ball.bounceOffCeiling();
+    if (CollisionDetector.hitWalls(ball)) ball.bounceOffWalls();
+    if (CollisionDetector.hitPlayer(ball, player)) ball.bounceOffPlayer(player);
     Mover.movePlayer(player);
     Mover.moveBall(ball);
     this.removeBrickIfHit();
