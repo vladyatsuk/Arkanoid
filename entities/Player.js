@@ -64,10 +64,6 @@ class Player {
 
     return this.x;
   }
-
-  move() {
-    this.x = this.nextPosition;
-  }
 }
 
 export default Player;

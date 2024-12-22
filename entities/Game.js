@@ -19,6 +19,7 @@ import {
 } from '../config/game.js';
 
 import Brick from './Brick.js';
+import Mover from './Mover.js';
 
 class Game {
   renderer;
@@ -225,8 +226,8 @@ class Game {
     if (ball.hitCeiling) ball.bounceOffCeiling();
     if (ball.hitWalls) ball.bounceOffWalls();
     if (ball.hitPlayer(player)) ball.bounceOffPlayer(player);
-    player.move();
-    ball.move();
+    Mover.movePlayer(player);
+    Mover.moveBall(ball);
     this.removeBrickIfHit();
     renderer.drawEntities({ ball, bricks, player });
     renderer.drawScores(this.score, this.bestScore);

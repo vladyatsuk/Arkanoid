@@ -40,11 +40,6 @@ class Ball {
     return this.x - this.r;
   }
 
-  move() {
-    this.x += this.speedX;
-    this.y -= this.speedY;
-  }
-
   get hitWalls() {
     const hitLeftWall = this.left + this.speedX <= LEFT_BORDER,
           hitRightWall = this.right + this.speedX >= RIGHT_BORDER;
