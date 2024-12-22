@@ -7,28 +7,30 @@ import Mover from './Mover.js';
 import CollisionDetector from './CollisionDetector.js';
 import Controls from './Controls.js';
 import BallPhysics from './BallPhysics.js';
-import ScoreSystem from './ScoreSystem.js';
-import LevelSystem from './LevelSystem.js';
+import ScoreManager from './ScoreManager.js';
+import LevelManager from './LevelManager.js';
+import BrickManager from './BrickManager.js';
 
 class Game {
   renderer;
   ball;
   player;
-  levelSystem;
-  scoreSystem;
+  bricks;
+  levelManager;
+  scoreManager;
 
   constructor({
     renderer,
     ball,
     player,
-    levelSystem = new LevelSystem(),
-    scoreSystem = new ScoreSystem(),
+    levelManager = new LevelManager(),
+    scoreManager = new ScoreManager(),
   }) {
     this.renderer = renderer;
     this.ball = ball;
     this.player = player;
-    this.levelSystem = levelSystem;
-    this.scoreSystem = scoreSystem;
+    this.levelManager = levelManager;
+    this.scoreManager = scoreManager;
   }
 
   get isLoss() {
@@ -38,34 +40,34 @@ class Game {
   }
 
   showGameStatus() {
-    const { renderer, scoreSystem, levelSystem } = this;
+    const { bricks, renderer, scoreManager, levelManager } = this;
 
-    if (levelSystem.isLevelDone) {
-      renderer.drawHeader(`You won level ${levelSystem.currentLevel} :)`);
-      scoreSystem.resetScore();
-      levelSystem.incrementLevelIndex();
+    if (BrickManager.isLevelDone(bricks)) {
+      renderer.drawHeader(`You won level ${levelManager.currentLevel} :)`);
+      scoreManager.resetScore();
+      levelManager.incrementLevelIndex();
 
-      if (levelSystem.isLastLevel) {
+      if (levelManager.isLastLevel) {
         renderer.drawHeader('You won the last level :)');
-        levelSystem.resetLevelIndex();
+        levelManager.resetLevelIndex();
       }
 
       this.reset();
     }
 
     if (this.isLoss) {
-      levelSystem.resetLevelIndex();
+      levelManager.resetLevelIndex();
       renderer.drawHeader('You lost :(');
       this.reset();
     }
 
-    scoreSystem.updateBestScore();
-    renderer.drawScores(scoreSystem.scores);
+    scoreManager.updateBestScore();
+    renderer.drawScores(scoreManager.scores);
   }
 
   init() {
-    const { levelSystem } = this;
-    levelSystem.createBricks();
+    const { levelManager } = this;
+    this.bricks = BrickManager.createBricks(levelManager.levelStructure);
     this.player.x = START_PLAYER_POS_X;
     this.ball.x = Game.generateRandomPosition();
     this.ball.y = START_BALL_POS_Y;
@@ -74,8 +76,8 @@ class Game {
   }
 
   reset() {
-    const { ball, player, scoreSystem } = this;
-    scoreSystem.resetScore();
+    const { ball, player, scoreManager } = this;
+    scoreManager.resetScore();
     ball.speedX = 0;
     ball.speedY = 0;
     player.x = START_PLAYER_POS_X;
@@ -85,15 +87,14 @@ class Game {
   }
 
   removeBrickIfHit() {
-    const { ball, scoreSystem, levelSystem } = this;
-    const { bricks } = levelSystem;
+    const { ball, bricks, scoreManager, levelManager } = this;
 
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
 
       if (brick.active && CollisionDetector.hitBrick(ball, brick)) {
-        scoreSystem.increaseScore(levelSystem.currentLevel);
-        brick.active = false;
+        scoreManager.increaseScore(levelManager.currentLevel);
+        BrickManager.removeBrick(brick);
         ball.speedY *= -1;
         break;
       }
@@ -101,8 +102,7 @@ class Game {
   }
 
   playGame() {
-    const { ball, player, renderer, scoreSystem, levelSystem } = this;
-    const { bricks } = levelSystem;
+    const { ball, player, bricks, renderer, scoreManager } = this;
 
     if (player.canLaunchBall) {
       player.x = START_PLAYER_POS_X;
@@ -124,7 +124,7 @@ class Game {
     Mover.moveBall(ball);
     this.removeBrickIfHit();
     renderer.drawEntities({ ball, bricks, player });
-    renderer.drawScores(scoreSystem.scores);
+    renderer.drawScores(scoreManager.scores);
     this.showGameStatus();
   }
 
