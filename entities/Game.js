@@ -1,7 +1,7 @@
 import { CANVAS_RIGHT } from '../constants/canvas.js';
 import { BALL_START_Y } from '../constants/ball.js';
 import { PLAYER_START_X } from '../constants/player.js';
-import { GAME_INDENT } from '../constants/game.js';
+import { GAME_INDENT, GAME_DELAY } from '../constants/game.js';
 
 import Ball from './Ball.js';
 import Player from './Player.js';
@@ -12,27 +12,30 @@ import BallPhysics from './BallPhysics.js';
 import ScoreManager from './ScoreManager.js';
 import LevelManager from './LevelManager.js';
 import BrickManager from './BrickManager.js';
+import EntityFactory from './EntityFactory.js';
 
 class Game {
-  #renderer;
+  #levelManager;
+  #scoreManager;
   #ball;
   #player;
   #bricks;
-  #levelManager;
-  #scoreManager;
+  #renderer;
 
   constructor({
-    renderer,
-    ball = new Ball(),
-    player = new Player(),
     levelManager = new LevelManager(),
     scoreManager = new ScoreManager(),
+    ball = new Ball(),
+    player = new Player(),
+    renderer,
   }) {
-    this.#renderer = renderer;
-    this.#ball = ball;
-    this.#player = player;
     this.#levelManager = levelManager;
     this.#scoreManager = scoreManager;
+    this.#ball = ball;
+    this.#player = player;
+    this.#renderer = renderer;
+    Controls.setControls(player, renderer, ball);
+    this.createLevel();
   }
 
   get isLoss() {
@@ -58,37 +61,24 @@ class Game {
         levelManager.resetLevelIndex();
       }
 
-      this.reset();
+      this.createLevel();
     }
 
     if (this.isLoss) {
       levelManager.resetLevelIndex();
       renderer.drawGameMessage('You lost :(');
-      this.reset();
+      this.createLevel();
     }
 
     scoreManager.updateBestScore();
     renderer.drawScores(scoreManager.scores);
   }
 
-  init() {
-    const player = this.#player,
-          ball = this.#ball,
-          levelManager = this.#levelManager,
-          renderer = this.#renderer;
-
-    this.#bricks = BrickManager.createBricks(levelManager.levelStructure);
-    player.x = PLAYER_START_X;
-    ball.x = Game.generateRandomPosition();
-    ball.y = BALL_START_Y;
-
-    Controls.setControls(player, renderer, ball);
-  }
-
-  reset() {
+  createLevel() {
     const ball = this.#ball,
           player = this.#player,
-          scoreManager = this.#scoreManager;
+          scoreManager = this.#scoreManager,
+          levelManager = this.#levelManager;
 
     scoreManager.resetScore();
     ball.speedX = 0;
@@ -96,7 +86,8 @@ class Game {
     player.x = PLAYER_START_X;
     player.canLaunchBall = true;
     ball.x = Game.generateRandomPosition();
-    this.init();
+    ball.y = BALL_START_Y;
+    this.#bricks = EntityFactory.createBricks(levelManager.levelStructure);
   }
 
   removeBrickIfHit() {
@@ -110,14 +101,14 @@ class Game {
 
       if (brick.active && CollisionDetector.hitBrick(ball, brick)) {
         scoreManager.increaseScore(levelManager.currentLevel);
-        BrickManager.removeBrick(brick);
+        BrickManager.remove(brick);
         ball.speedY *= -1;
         break;
       }
     }
   }
 
-  playGame() {
+  #loop() {
     const ball = this.#ball,
           player = this.#player,
           bricks = this.#bricks,
@@ -146,6 +137,10 @@ class Game {
     renderer.drawEntities({ ball, bricks, player });
     renderer.drawScores(scoreManager.scores);
     this.showGameStatus();
+  }
+
+  start() {
+    setInterval(() => this.#loop(), GAME_DELAY);
   }
 
   static generateRandomPosition() {
