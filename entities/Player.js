@@ -1,4 +1,3 @@
-import { CANVAS_LEFT, CANVAS_RIGHT } from '../constants/canvas.js';
 import {
   PLAYER_WIDTH as WIDTH,
   PLAYER_HEIGHT as HEIGHT,
@@ -15,9 +14,6 @@ class Player {
   width;
   height;
   speed;
-  leftKey = false;
-  rightKey = false;
-  canLaunchBall = true;
 
   constructor({
     color = COLOR,
@@ -48,28 +44,6 @@ class Player {
   }
 
   get left() {
-    return this.x;
-  }
-
-  get leftKeyPressed() {
-    return this.leftKey;
-  }
-
-  get rightKeyPressed() {
-    return this.rightKey;
-  }
-
-  get nextPosition() {
-    if (this.leftKeyPressed) {
-      const leftmostPossiblePosition = CANVAS_LEFT;
-      this.x = Math.max(leftmostPossiblePosition, this.x - this.speed);
-    }
-
-    if (this.rightKeyPressed) {
-      const rightmostPossiblePosition = CANVAS_RIGHT - this.width;
-      this.x = Math.min(rightmostPossiblePosition, this.x + this.speed);
-    }
-
     return this.x;
   }
 }

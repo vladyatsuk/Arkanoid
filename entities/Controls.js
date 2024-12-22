@@ -1,49 +1,53 @@
 import { BALL_SPEED_X, BALL_SPEED_Y } from '../constants/ball.js';
+import { STATES } from '../constants/gameState.js';
 
 class Controls {
-  static #handleKeyDown(event, player) {
+  static leftKey = false;
+  static rightKey = false;
+
+  static #handleKeyDown(event) {
     const { code } = event;
 
     if (code === 'KeyA' || code === 'ArrowLeft') {
-      player.leftKey = true;
+      this.leftKey = true;
     }
 
     if (code === 'KeyD' || code === 'ArrowRight') {
-      player.rightKey = true;
+      this.rightKey = true;
     }
   }
 
-  static #handleKeyUp(event, player) {
+  static #handleKeyUp(event) {
     const { code } = event;
 
     if (code === 'KeyA' || code === 'ArrowLeft') {
-      player.leftKey = false;
+      this.leftKey = false;
     }
 
     if (code === 'KeyD' || code === 'ArrowRight') {
-      player.rightKey = false;
+      this.rightKey = false;
     }
   }
 
-  static #handleGameStartOnKeys(event, player, ball) {
+  static #handleGameStartOnKeys(event, ball, gameState) {
     const { code } = event;
 
     if (code === 'KeyS' || code === 'ArrowDown') {
-      if (player.canLaunchBall) {
+      if (gameState.state === STATES.WAITING) {
         ball.speedX = BALL_SPEED_X;
         ball.speedY = BALL_SPEED_Y;
-        player.canLaunchBall = false;
+        gameState.transition(STATES.PLAYING);
       }
     }
   }
 
-  static setControls(player, ball) {
+  static setControls(ball, gameState) {
     document.addEventListener('keydown', (event) => {
-      this.#handleKeyDown(event, player);
-      this.#handleGameStartOnKeys(event, player, ball);
+      this.#handleKeyDown(event);
+      this.#handleGameStartOnKeys(event, ball, gameState);
     });
     document.addEventListener('keyup', (event) => {
-      this.#handleKeyUp(event, player);
+      this.#handleKeyUp(event);
     });
   }
 }

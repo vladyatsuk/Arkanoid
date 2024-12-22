@@ -38,7 +38,8 @@ class Game {
     this.#ball = ball;
     this.#player = player;
     this.#renderer = renderer;
-    Controls.setControls(player, ball);
+    this.#gameMessage.set('Press \'s\' to play!');
+    Controls.setControls(ball, this.#gameState);
     this.#createLevel();
   }
 
@@ -53,11 +54,6 @@ class Game {
     const player = this.#player;
 
     player.x = PLAYER_START_X;
-    if (!player.canLaunchBall) {
-      this.#gameState.transition(STATES.PLAYING);
-    }
-
-    this.#gameMessage.set('Press \'s\' to play!');
   }
 
   #handlePlaying() {
@@ -78,7 +74,7 @@ class Game {
     }
 
     if (CollisionDetector.hitPlayer(ball, player)) {
-      BallPhysics.bounceOffPlayer(ball, player);
+      BallPhysics.bounceOffPlayer(ball);
     }
 
     for (const brick of bricks) {
@@ -136,7 +132,6 @@ class Game {
     ball.speedX = 0;
     ball.speedY = 0;
     player.x = PLAYER_START_X;
-    player.canLaunchBall = true;
     ball.x = Game.generateRandomPosition();
     ball.y = BALL_START_Y;
     this.#bricks = EntityFactory.createBricks(levelManager.levelStructure);
