@@ -2,6 +2,7 @@ import { CANVAS_RIGHT } from '../constants/canvas.js';
 import { BALL_START_Y } from '../constants/ball.js';
 import { PLAYER_START_X } from '../constants/player.js';
 import { GAME_INDENT, GAME_DELAY } from '../constants/game.js';
+import { STATES } from '../constants/gameState.js';
 
 import Ball from './Ball.js';
 import Player from './Player.js';
@@ -12,14 +13,18 @@ import BallPhysics from './BallPhysics.js';
 import ScoreManager from './ScoreManager.js';
 import LevelManager from './LevelManager.js';
 import EntityFactory from './EntityFactory.js';
+import GameState from './GameState.js';
+import GameMessage from './GameMessage.js';
 
 class Game {
   #levelManager;
   #scoreManager;
+  #gameState = new GameState();
   #ball;
   #player;
   #bricks;
   #renderer;
+  #gameMessage = new GameMessage();
 
   constructor({
     levelManager = new LevelManager(),
@@ -33,73 +38,36 @@ class Game {
     this.#ball = ball;
     this.#player = player;
     this.#renderer = renderer;
-    Controls.setControls(player, renderer, ball);
-    this.createLevel();
+    Controls.setControls(player, ball);
+    this.#createLevel();
   }
 
-  get isLoss() {
+  get #isLoss() {
     const ball = this.#ball,
           player = this.#player;
 
     return ball.top > player.bottom;
   }
 
-  showGameStatus() {
-    const bricks = this.#bricks,
-          renderer = this.#renderer,
-          scoreManager = this.#scoreManager,
-          levelManager = this.#levelManager;
+  #handleWaiting() {
+    const player = this.#player;
 
-    if (!bricks.size) {
-      renderer.drawGameMessage(`You won level ${levelManager.currentLevel} :)`);
-      scoreManager.resetScore();
-      levelManager.incrementLevelIndex();
-
-      if (levelManager.isLastLevel) {
-        renderer.drawGameMessage('You won the last level :)');
-        levelManager.resetLevelIndex();
-      }
-
-      this.createLevel();
-    }
-
-    if (this.isLoss) {
-      levelManager.resetLevelIndex();
-      renderer.drawGameMessage('You lost :(');
-      this.createLevel();
-    }
-
-    scoreManager.updateBestScore();
-    renderer.drawScores(scoreManager.scores);
-  }
-
-  createLevel() {
-    const ball = this.#ball,
-          player = this.#player,
-          scoreManager = this.#scoreManager,
-          levelManager = this.#levelManager;
-
-    scoreManager.resetScore();
-    ball.speedX = 0;
-    ball.speedY = 0;
     player.x = PLAYER_START_X;
-    player.canLaunchBall = true;
-    ball.x = Game.generateRandomPosition();
-    ball.y = BALL_START_Y;
-    this.#bricks = EntityFactory.createBricks(levelManager.levelStructure);
+    if (!player.canLaunchBall) {
+      this.#gameState.transition(STATES.PLAYING);
+    }
+
+    this.#gameMessage.set('Press \'s\' to play!');
   }
 
-  #loop() {
+  #handlePlaying() {
     const ball = this.#ball,
           player = this.#player,
           bricks = this.#bricks,
           scoreManager = this.#scoreManager,
-          levelManager = this.#levelManager,
-          renderer = this.#renderer;
+          levelManager = this.#levelManager;
 
-    if (player.canLaunchBall) {
-      player.x = PLAYER_START_X;
-    }
+    this.#gameMessage.set('Break all the bricks!');
 
     if (CollisionDetector.hitCeiling(ball)) {
       BallPhysics.bounceOffCeiling(ball);
@@ -116,6 +84,7 @@ class Game {
     for (const brick of bricks) {
       if (CollisionDetector.hitBrick(ball, brick)) {
         scoreManager.increaseScore(levelManager.currentLevel);
+        scoreManager.updateBestScore();
         bricks.delete(brick);
         BallPhysics.bounceOffBrick(ball);
         break;
@@ -124,9 +93,85 @@ class Game {
 
     Mover.movePlayer(player);
     Mover.moveBall(ball);
+    if (!bricks.size) {
+      this.#gameState.transition(STATES.LEVEL_DONE);
+    } else if (this.#isLoss) {
+      this.#gameState.transition(STATES.LOST);
+    }
+  }
+
+  #handleLevelDone() {
+    const scoreManager = this.#scoreManager,
+          levelManager = this.#levelManager;
+
+    this.#gameMessage.set(`You won level ${levelManager.currentLevel} :)`);
+    scoreManager.resetScore();
+    levelManager.incrementLevelIndex();
+
+    if (levelManager.isLastLevel) {
+      this.#gameMessage.set('You won the last level :)');
+      levelManager.resetLevelIndex();
+    }
+
+    this.#createLevel();
+    this.#gameState.transition(STATES.WAITING);
+  }
+
+  #handleLost() {
+    const levelManager = this.#levelManager;
+
+    levelManager.resetLevelIndex();
+    this.#gameMessage.set('You lost :(');
+    this.#createLevel();
+    this.#gameState.transition(STATES.WAITING);
+  }
+
+  #createLevel() {
+    const ball = this.#ball,
+          player = this.#player,
+          scoreManager = this.#scoreManager,
+          levelManager = this.#levelManager;
+
+    scoreManager.resetScore();
+    ball.speedX = 0;
+    ball.speedY = 0;
+    player.x = PLAYER_START_X;
+    player.canLaunchBall = true;
+    ball.x = Game.generateRandomPosition();
+    ball.y = BALL_START_Y;
+    this.#bricks = EntityFactory.createBricks(levelManager.levelStructure);
+  }
+
+  #loop() {
+    const renderer = this.#renderer,
+          ball = this.#ball,
+          player = this.#player,
+          bricks = this.#bricks,
+          scoreManager = this.#scoreManager;
+
+    const handler = {
+      [STATES.WAITING]: () => {
+        this.#handleWaiting();
+      },
+      [STATES.PLAYING]: () => {
+        this.#handlePlaying();
+      },
+      [STATES.LEVEL_DONE]: () => {
+        this.#handleLevelDone();
+      },
+      [STATES.LOST]: () => {
+        this.#handleLost();
+      },
+    }[this.#gameState.state];
+
+    if (!handler) {
+      throw new Error(`Unhandled state: ${this.#gameState.state}`);
+    }
+
+    handler();
     renderer.drawEntities({ ball, bricks, player });
     renderer.drawScores(scoreManager.scores);
-    this.showGameStatus();
+    renderer.drawGameMessage(this.#gameMessage.value);
   }
 
   start() {

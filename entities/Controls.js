@@ -25,12 +25,11 @@ class Controls {
     }
   }
 
-  static #handleGameStartOnKeys(event, player, renderer, ball) {
+  static #handleGameStartOnKeys(event, player, ball) {
     const { code } = event;
 
     if (code === 'KeyS' || code === 'ArrowDown') {
       if (player.canLaunchBall) {
-        renderer.drawGameMessage('Break all the bricks!');
         ball.speedX = BALL_SPEED_X;
         ball.speedY = BALL_SPEED_Y;
         player.canLaunchBall = false;
@@ -38,10 +37,10 @@ class Controls {
     }
   }
 
-  static setControls(player, renderer, ball) {
+  static setControls(player, ball) {
     document.addEventListener('keydown', (event) => {
       this.#handleKeyDown(event, player);
-      this.#handleGameStartOnKeys(event, player, renderer, ball);
+      this.#handleGameStartOnKeys(event, player, ball);
     });
     document.addEventListener('keyup', (event) => {
       this.#handleKeyUp(event, player);
