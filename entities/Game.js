@@ -21,6 +21,7 @@ import {
 import Brick from './Brick.js';
 import Mover from './Mover.js';
 import CollisionDetector from './CollisionDetector.js';
+import Controls from './Controls.js';
 
 class Game {
   renderer;
@@ -47,59 +48,6 @@ class Game {
     this.ball = ball;
     this.player = player;
     this.bricks = bricks;
-  }
-
-  handleKeyDown(event) {
-    const { code } = event;
-    const { player } = this;
-
-    if (code === 'KeyA' || code === 'ArrowLeft') {
-      player.leftKey = true;
-    }
-
-    if (code === 'KeyD' || code === 'ArrowRight') {
-      player.rightKey = true;
-    }
-  }
-
-  handleKeyUp(event) {
-    const { code } = event;
-    const { player } = this;
-
-    if (code === 'KeyA' || code === 'ArrowLeft') {
-      player.leftKey = false;
-    }
-
-    if (code === 'KeyD' || code === 'ArrowRight') {
-      player.rightKey = false;
-    }
-  }
-
-  handleGameStartOnKeys(event) {
-    const { code } = event;
-    const { player } = this;
-
-    if (code === 'KeyS' || code === 'ArrowDown') {
-      if (player.canLaunchBall) {
-        const { renderer, ball } = this;
-        renderer.drawHeader('Break all the bricks!');
-        ball.speedX = player.speed;
-        ball.speedY = player.speed;
-        player.canLaunchBall = false;
-      }
-    }
-  }
-
-  setControls() {
-    document.addEventListener('keydown', (event) => {
-      this.handleKeyDown(event);
-    });
-    document.addEventListener('keyup', (event) => {
-      this.handleKeyUp(event);
-    });
-    document.addEventListener('keydown', (event) => {
-      this.handleGameStartOnKeys(event);
-    });
   }
 
   get isFullLevelScore() {
@@ -191,7 +139,7 @@ class Game {
       }
     }
 
-    this.setControls();
+    Controls.setControls(this.player, this.renderer, this.ball);
   }
 
   reset() {
