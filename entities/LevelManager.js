@@ -1,11 +1,7 @@
-import {
-  START_LEVEL_INDEX,
-  LAST_LEVEL,
-  LEVELS,
-} from '../config/game.js';
+import { START_INDEX, LAST_INDEX, LEVELS } from '../constants/levels.js';
 
 class LevelManager {
-  levelIndex = START_LEVEL_INDEX;
+  levelIndex = START_INDEX;
 
   incrementLevelIndex() {
     this.levelIndex += 1;
@@ -16,7 +12,7 @@ class LevelManager {
   }
 
   get isLastLevel() {
-    return this.levelIndex === LAST_LEVEL;
+    return this.levelIndex === LAST_INDEX;
   }
 
   get currentLevel() {

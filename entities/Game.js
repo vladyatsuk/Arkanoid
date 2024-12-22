@@ -1,8 +1,10 @@
-import { RIGHT_BORDER } from '../config/canvas.js';
-import { START_POS_Y as START_BALL_POS_Y } from '../config/ball.js';
-import { START_PLAYER_POS_X } from '../config/player.js';
-import { INDENT } from '../config/game.js';
+import { CANVAS_RIGHT } from '../constants/canvas.js';
+import { BALL_START_Y } from '../constants/ball.js';
+import { PLAYER_START_X } from '../constants/player.js';
+import { GAME_INDENT } from '../constants/game.js';
 
+import Ball from './Ball.js';
+import Player from './Player.js';
 import Mover from './Mover.js';
 import CollisionDetector from './CollisionDetector.js';
 import Controls from './Controls.js';
@@ -12,43 +14,47 @@ import LevelManager from './LevelManager.js';
 import BrickManager from './BrickManager.js';
 
 class Game {
-  renderer;
-  ball;
-  player;
-  bricks;
-  levelManager;
-  scoreManager;
+  #renderer;
+  #ball;
+  #player;
+  #bricks;
+  #levelManager;
+  #scoreManager;
 
   constructor({
     renderer,
-    ball,
-    player,
+    ball = new Ball(),
+    player = new Player(),
     levelManager = new LevelManager(),
     scoreManager = new ScoreManager(),
   }) {
-    this.renderer = renderer;
-    this.ball = ball;
-    this.player = player;
-    this.levelManager = levelManager;
-    this.scoreManager = scoreManager;
+    this.#renderer = renderer;
+    this.#ball = ball;
+    this.#player = player;
+    this.#levelManager = levelManager;
+    this.#scoreManager = scoreManager;
   }
 
   get isLoss() {
-    const { ball, player } = this;
+    const ball = this.#ball,
+          player = this.#player;
 
     return ball.top > player.bottom;
   }
 
   showGameStatus() {
-    const { bricks, renderer, scoreManager, levelManager } = this;
+    const bricks = this.#bricks,
+          renderer = this.#renderer,
+          scoreManager = this.#scoreManager,
+          levelManager = this.#levelManager;
 
     if (BrickManager.isLevelDone(bricks)) {
-      renderer.drawHeader(`You won level ${levelManager.currentLevel} :)`);
+      renderer.drawGameMessage(`You won level ${levelManager.currentLevel} :)`);
       scoreManager.resetScore();
       levelManager.incrementLevelIndex();
 
       if (levelManager.isLastLevel) {
-        renderer.drawHeader('You won the last level :)');
+        renderer.drawGameMessage('You won the last level :)');
         levelManager.resetLevelIndex();
       }
 
@@ -57,7 +63,7 @@ class Game {
 
     if (this.isLoss) {
       levelManager.resetLevelIndex();
-      renderer.drawHeader('You lost :(');
+      renderer.drawGameMessage('You lost :(');
       this.reset();
     }
 
@@ -66,28 +72,38 @@ class Game {
   }
 
   init() {
-    const { levelManager } = this;
-    this.bricks = BrickManager.createBricks(levelManager.levelStructure);
-    this.player.x = START_PLAYER_POS_X;
-    this.ball.x = Game.generateRandomPosition();
-    this.ball.y = START_BALL_POS_Y;
+    const player = this.#player,
+          ball = this.#ball,
+          levelManager = this.#levelManager,
+          renderer = this.#renderer;
 
-    Controls.setControls(this.player, this.renderer, this.ball);
+    this.#bricks = BrickManager.createBricks(levelManager.levelStructure);
+    player.x = PLAYER_START_X;
+    ball.x = Game.generateRandomPosition();
+    ball.y = BALL_START_Y;
+
+    Controls.setControls(player, renderer, ball);
   }
 
   reset() {
-    const { ball, player, scoreManager } = this;
+    const ball = this.#ball,
+          player = this.#player,
+          scoreManager = this.#scoreManager;
+
     scoreManager.resetScore();
     ball.speedX = 0;
     ball.speedY = 0;
-    player.x = START_PLAYER_POS_X;
+    player.x = PLAYER_START_X;
     player.canLaunchBall = true;
     ball.x = Game.generateRandomPosition();
     this.init();
   }
 
   removeBrickIfHit() {
-    const { ball, bricks, scoreManager, levelManager } = this;
+    const ball = this.#ball,
+          bricks = this.#bricks,
+          scoreManager = this.#scoreManager,
+          levelManager = this.#levelManager;
 
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
@@ -102,10 +118,14 @@ class Game {
   }
 
   playGame() {
-    const { ball, player, bricks, renderer, scoreManager } = this;
+    const ball = this.#ball,
+          player = this.#player,
+          bricks = this.#bricks,
+          scoreManager = this.#scoreManager,
+          renderer = this.#renderer;
 
     if (player.canLaunchBall) {
-      player.x = START_PLAYER_POS_X;
+      player.x = PLAYER_START_X;
     }
 
     if (CollisionDetector.hitCeiling(ball)) {
@@ -130,7 +150,7 @@ class Game {
 
   static generateRandomPosition() {
     // eslint-disable-next-line no-magic-numbers
-    return Math.random() * (RIGHT_BORDER - 2 * INDENT) + INDENT;
+    return Math.random() * (CANVAS_RIGHT - 2 * GAME_INDENT) + GAME_INDENT;
   }
 }
 

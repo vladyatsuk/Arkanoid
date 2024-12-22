@@ -1,9 +1,8 @@
-import { BASE_REWARD } from '../config/game.js';
-import { START_SCORE, START_BEST_SCORE } from '../config/scores.js';
+import { START_CURRENT, START_BEST, BASE_REWARD } from '../constants/score.js';
 
 class ScoreManager {
-  #current = START_SCORE;
-  #best = START_BEST_SCORE;
+  #current = START_CURRENT;
+  #best = START_BEST;
 
   get scores() {
     return { current: this.#current, best: this.#best };

@@ -1,30 +1,38 @@
+import { CANVAS_LEFT, CANVAS_RIGHT } from '../constants/canvas.js';
 import {
-  RIGHT_BORDER,
-  LEFT_BORDER,
-} from '../config/canvas.js';
+  PLAYER_WIDTH as WIDTH,
+  PLAYER_HEIGHT as HEIGHT,
+  PLAYER_COLOR as COLOR,
+  PLAYER_SPEED as SPEED,
+  PLAYER_START_X as START_X,
+  PLAYER_START_Y as START_Y,
+} from '../constants/player.js';
 
 class Player {
   color;
-  header;
   x;
   y;
   width;
   height;
   speed;
-  ball;
   leftKey = false;
   rightKey = false;
   canLaunchBall = true;
 
-  constructor({ color, header, x, y, width, height, speed, ball }) {
+  constructor({
+    color = COLOR,
+    x = START_X,
+    y = START_Y,
+    width = WIDTH,
+    height = HEIGHT,
+    speed = SPEED,
+  } = {}) {
     this.color = color;
-    this.header = header;
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.speed = speed;
-    this.ball = ball;
   }
 
   get top() {
@@ -53,12 +61,12 @@ class Player {
 
   get nextPosition() {
     if (this.leftKeyPressed) {
-      const leftmostPossiblePosition = LEFT_BORDER;
+      const leftmostPossiblePosition = CANVAS_LEFT;
       this.x = Math.max(leftmostPossiblePosition, this.x - this.speed);
     }
 
     if (this.rightKeyPressed) {
-      const rightmostPossiblePosition = RIGHT_BORDER - this.width;
+      const rightmostPossiblePosition = CANVAS_RIGHT - this.width;
       this.x = Math.min(rightmostPossiblePosition, this.x + this.speed);
     }
 

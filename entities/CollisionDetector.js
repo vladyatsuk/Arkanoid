@@ -1,15 +1,15 @@
-import { TOP_BORDER, RIGHT_BORDER, LEFT_BORDER } from '../config/canvas.js';
+import { CANVAS_TOP, CANVAS_RIGHT, CANVAS_LEFT } from '../constants/canvas.js';
 
 class CollisionDetector {
   static hitWalls(ball) {
-    const hitLeftWall = ball.left + ball.speedX <= LEFT_BORDER,
-          hitRightWall = ball.right + ball.speedX >= RIGHT_BORDER;
+    const hitLeftWall = ball.left + ball.speedX <= CANVAS_LEFT,
+          hitRightWall = ball.right + ball.speedX >= CANVAS_RIGHT;
 
     return hitLeftWall || hitRightWall;
   }
 
   static hitCeiling(ball) {
-    return ball.top + ball.speedY <= TOP_BORDER;
+    return ball.top + ball.speedY <= CANVAS_TOP;
   }
 
   static hitPlayer(ball, player) {

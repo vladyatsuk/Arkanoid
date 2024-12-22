@@ -1,9 +1,9 @@
 import {
-  START_X,
-  START_Y,
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-} from '../config/canvas.js';
+  CANVAS_WIDTH as WIDTH,
+  CANVAS_HEIGHT as HEIGHT,
+  CANVAS_START_X as START_X,
+  CANVAS_START_Y as START_Y,
+} from '../constants/canvas.js';
 
 const START_ANGLE = 0,
       // eslint-disable-next-line no-magic-numbers
@@ -11,37 +11,44 @@ const START_ANGLE = 0,
 
 class Renderer {
   #ctx;
-  #scoreLabel;
-  #bestScoreLabel;
-  #header;
+  #currentScoreElement;
+  #bestScoreElement;
+  #gameMessageElement;
 
-  constructor(ctx, scoreLabel, bestScoreLabel, header) {
+  constructor({
+    ctx,
+    currentScoreElement,
+    bestScoreElement,
+    gameMessageElement,
+  }) {
     this.#ctx = ctx;
-    this.#scoreLabel = scoreLabel;
-    this.#bestScoreLabel = bestScoreLabel;
-    this.#header = header;
+    this.#currentScoreElement = currentScoreElement;
+    this.#bestScoreElement = bestScoreElement;
+    this.#gameMessageElement = gameMessageElement;
   }
 
   clearCanvas() {
-    this.#ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
+    this.#ctx.clearRect(START_X, START_Y, WIDTH, HEIGHT);
   }
 
   drawBall(ball) {
     const ctx = this.#ctx;
+    const { color, x, y, r } = ball;
     ctx.save();
-    ctx.fillStyle = ball.color;
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, START_ANGLE, FULL_CIRCLE, false);
+    ctx.arc(x, y, r, START_ANGLE, FULL_CIRCLE, false);
     ctx.fill();
     ctx.restore();
   }
 
   drawPlayer(player) {
     const ctx = this.#ctx;
+    const { color, x, y, width, height } = player;
     ctx.save();
-    ctx.fillStyle = player.color;
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.rect(player.x, player.y, player.width, player.height);
+    ctx.rect(x, y, width, height);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
@@ -49,10 +56,11 @@ class Renderer {
 
   drawBrick(brick) {
     const ctx = this.#ctx;
+    const { color, x, y, width, height } = brick;
     ctx.save();
-    ctx.fillStyle = brick.color;
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.rect(brick.x, brick.y, brick.width, brick.height);
+    ctx.rect(x, y, width, height);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
@@ -76,11 +84,11 @@ class Renderer {
   }
 
   drawScore(score) {
-    this.#scoreLabel.innerHTML = `Score: ${score}`;
+    this.#currentScoreElement.innerHTML = `Score: ${score}`;
   }
 
   drawBestScore(bestScore) {
-    this.#bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
+    this.#bestScoreElement.innerHTML = `Best score: ${bestScore}`;
   }
 
   drawScores({ current, best }) {
@@ -88,8 +96,8 @@ class Renderer {
     this.drawBestScore(best);
   }
 
-  drawHeader(message) {
-    this.#header.innerHTML = message;
+  drawGameMessage(message) {
+    this.#gameMessageElement.innerHTML = message;
   }
 }
 

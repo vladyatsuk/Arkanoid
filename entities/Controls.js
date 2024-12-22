@@ -1,3 +1,5 @@
+import { BALL_SPEED_X, BALL_SPEED_Y } from '../constants/ball.js';
+
 class Controls {
   static #handleKeyDown(event, player) {
     const { code } = event;
@@ -28,9 +30,9 @@ class Controls {
 
     if (code === 'KeyS' || code === 'ArrowDown') {
       if (player.canLaunchBall) {
-        renderer.drawHeader('Break all the bricks!');
-        ball.speedX = player.speed;
-        ball.speedY = player.speed;
+        renderer.drawGameMessage('Break all the bricks!');
+        ball.speedX = BALL_SPEED_X;
+        ball.speedY = BALL_SPEED_Y;
         player.canLaunchBall = false;
       }
     }

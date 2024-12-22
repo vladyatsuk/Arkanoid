@@ -1,12 +1,9 @@
-import {
-  BOOST,
-  SPEED,
-} from '../config/ball.js';
+import { BALL_BOOST, BALL_SPEED_X } from '../constants/ball.js';
 
 class BallPhysics {
   static bounceOffCeiling(ball) {
     ball.speedY *= -1;
-    ball.y += BOOST;
+    ball.y += BALL_BOOST;
   }
 
   static bounceOffWalls(ball) {
@@ -15,9 +12,9 @@ class BallPhysics {
 
   static bounceOffPlayer(ball, player) {
     ball.speedY *= -1;
-    ball.y -= BOOST;
-    if (player.leftKeyPressed) ball.speedX = -SPEED;
-    if (player.rightKeyPressed) ball.speedX = SPEED;
+    ball.y -= BALL_BOOST;
+    if (player.leftKeyPressed) ball.speedX = -BALL_SPEED_X;
+    if (player.rightKeyPressed) ball.speedX = BALL_SPEED_X;
   }
 }
 
