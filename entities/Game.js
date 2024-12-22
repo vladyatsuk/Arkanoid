@@ -1,76 +1,35 @@
 import { RIGHT_BORDER } from '../config/canvas.js';
-
-import {
-  BRICK_WIDTH,
-  BRICK_HEIGHT,
-  BRICK_X_OFFSET,
-  BRICK_Y_OFFSET,
-} from '../config/brick.js';
-
 import { START_POS_Y as START_BALL_POS_Y } from '../config/ball.js';
 import { START_PLAYER_POS_X } from '../config/player.js';
+import { BASE_REWARD, INDENT } from '../config/game.js';
 
-import {
-  BASE_REWARD,
-  LEVELS,
-  LAST_LEVEL,
-  COLORS,
-  INDENT,
-} from '../config/game.js';
-
-import Brick from './Brick.js';
 import Mover from './Mover.js';
 import CollisionDetector from './CollisionDetector.js';
 import Controls from './Controls.js';
 import BallPhysics from './BallPhysics.js';
+import LevelManager from './LevelManager.js';
+import LevelData from './LevelData.js';
 
 class Game {
   renderer;
   score;
   bestScore;
-  levelIndex;
   ball;
   player;
-  bricks;
+  levelData = new LevelData();
 
   constructor({
     renderer,
     score,
     bestScore,
-    levelIndex,
     ball,
     player,
-    bricks,
   }) {
     this.renderer = renderer;
     this.score = score;
     this.bestScore = bestScore;
-    this.levelIndex = levelIndex;
     this.ball = ball;
     this.player = player;
-    this.bricks = bricks;
-  }
-
-  get isFullLevelScore() {
-    const { bricks } = this;
-
-    return this.score === BASE_REWARD * this.currentLevel * bricks.length;
-  }
-
-  get levelData() {
-    return LEVELS[this.levelIndex];
-  }
-
-  incrementLevelIndex() {
-    this.levelIndex += 1;
-  }
-
-  get isLastLevel() {
-    return this.levelIndex === LAST_LEVEL;
-  }
-
-  resetLevelIndex() {
-    this.levelIndex = 0;
   }
 
   resetScore() {
@@ -78,7 +37,9 @@ class Game {
   }
 
   increaseScore() {
-    this.score += BASE_REWARD * this.currentLevel;
+    const { levelData } = this;
+
+    this.score += BASE_REWARD * levelData.currentLevel;
   }
 
   updateBestScore() {
@@ -94,23 +55,23 @@ class Game {
   }
 
   showGameStatus() {
-    const { renderer } = this;
+    const { renderer, levelData } = this;
 
-    if (this.isFullLevelScore) {
-      renderer.drawHeader(`You won level ${this.currentLevel} :)`);
+    if (levelData.isLevelDone) {
+      renderer.drawHeader(`You won level ${levelData.currentLevel} :)`);
       this.resetScore();
-      this.incrementLevelIndex();
+      LevelManager.incrementLevelIndex(levelData);
 
-      if (this.isLastLevel) {
+      if (levelData.isLastLevel) {
         renderer.drawHeader('You won the last level :)');
-        this.resetLevelIndex();
+        LevelManager.resetLevelIndex(levelData);
       }
 
       this.reset();
     }
 
     if (this.isLoss) {
-      this.resetLevelIndex();
+      LevelManager.resetLevelIndex(levelData);
       renderer.drawHeader('You lost :(');
       this.reset();
     }
@@ -120,25 +81,11 @@ class Game {
   }
 
   init() {
-    const level = this.levelData;
-    this.bricks = [];
+    const { levelData } = this;
+    LevelManager.initLevel(levelData);
     this.player.x = START_PLAYER_POS_X;
     this.ball.x = Game.generateRandomPosition();
     this.ball.y = START_BALL_POS_Y;
-
-    for (let y = 0; y < level.length; y++) {
-      for (let x = 0; x < level.length; x++) {
-        if (level[y][x]) {
-          this.bricks.push(new Brick({
-            color: COLORS[Math.floor(Math.random() * COLORS.length)],
-            x: BRICK_X_OFFSET + x * BRICK_WIDTH,
-            y: BRICK_Y_OFFSET + y * BRICK_HEIGHT,
-            width: BRICK_WIDTH,
-            height: BRICK_HEIGHT,
-          }));
-        }
-      }
-    }
 
     Controls.setControls(this.player, this.renderer, this.ball);
   }
@@ -155,7 +102,8 @@ class Game {
   }
 
   removeBrickIfHit() {
-    const { ball, bricks } = this;
+    const { ball } = this;
+    const { bricks } = this.levelData;
 
     for (let i = 0; i < bricks.length; i++) {
       const brick = bricks[i];
@@ -170,7 +118,8 @@ class Game {
   }
 
   playGame() {
-    const { ball, bricks, player, renderer } = this;
+    const { ball, player, renderer } = this;
+    const { bricks } = this.levelData;
 
     if (player.canLaunchBall) {
       player.x = START_PLAYER_POS_X;
@@ -199,11 +148,6 @@ class Game {
   static generateRandomPosition() {
     // eslint-disable-next-line no-magic-numbers
     return Math.random() * (RIGHT_BORDER - 2 * INDENT) + INDENT;
-  }
-
-  get currentLevel() {
-    // eslint-disable-next-line no-magic-numbers
-    return this.levelIndex + 1;
   }
 }
 

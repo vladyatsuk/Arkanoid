@@ -19,13 +19,7 @@ import {
   START_PLAYER_POS_Y,
 } from './config/player.js';
 
-import {
-  DELAY,
-  START_BRICKS,
-  START_SCORE,
-  START_BEST_SCORE,
-  START_LEVEL_INDEX,
-} from './config/game.js';
+import { DELAY, START_SCORE, START_BEST_SCORE, } from './config/game.js';
 
 import Renderer from './entities/Renderer.js';
 import Ball from './entities/Ball.js';
@@ -66,10 +60,8 @@ const main = () => {
           renderer,
           score: START_SCORE,
           bestScore: START_BEST_SCORE,
-          levelIndex: START_LEVEL_INDEX,
           ball,
           player,
-          bricks: START_BRICKS,
         });
 
   Object.assign(canvas, { width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
