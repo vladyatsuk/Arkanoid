@@ -80,11 +80,11 @@ class Renderer {
   }
 
   drawScore(score) {
-    this.#currentScoreElement.innerHTML = `Score: ${score}`;
+    this.#currentScoreElement.textContent = `${score}`;
   }
 
   drawBestScore(bestScore) {
-    this.#bestScoreElement.innerHTML = `Best score: ${bestScore}`;
+    this.#bestScoreElement.textContent = `${bestScore}`;
   }
 
   drawScores({ current, best }) {
@@ -93,7 +93,7 @@ class Renderer {
   }
 
   drawGameMessage(message) {
-    this.#gameMessageElement.innerHTML = message;
+    this.#gameMessageElement.textContent = message;
   }
 }
 
