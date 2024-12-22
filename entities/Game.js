@@ -11,7 +11,6 @@ import Controls from './Controls.js';
 import BallPhysics from './BallPhysics.js';
 import ScoreManager from './ScoreManager.js';
 import LevelManager from './LevelManager.js';
-import BrickManager from './BrickManager.js';
 import EntityFactory from './EntityFactory.js';
 
 class Game {
@@ -51,7 +50,7 @@ class Game {
           scoreManager = this.#scoreManager,
           levelManager = this.#levelManager;
 
-    if (BrickManager.isLevelDone(bricks)) {
+    if (!bricks.size) {
       renderer.drawGameMessage(`You won level ${levelManager.currentLevel} :)`);
       scoreManager.resetScore();
       levelManager.incrementLevelIndex();
@@ -90,29 +89,12 @@ class Game {
     this.#bricks = EntityFactory.createBricks(levelManager.levelStructure);
   }
 
-  removeBrickIfHit() {
-    const ball = this.#ball,
-          bricks = this.#bricks,
-          scoreManager = this.#scoreManager,
-          levelManager = this.#levelManager;
-
-    for (let i = 0; i < bricks.length; i++) {
-      const brick = bricks[i];
-
-      if (brick.active && CollisionDetector.hitBrick(ball, brick)) {
-        scoreManager.increaseScore(levelManager.currentLevel);
-        BrickManager.remove(brick);
-        ball.speedY *= -1;
-        break;
-      }
-    }
-  }
-
   #loop() {
     const ball = this.#ball,
           player = this.#player,
           bricks = this.#bricks,
           scoreManager = this.#scoreManager,
+          levelManager = this.#levelManager,
           renderer = this.#renderer;
 
     if (player.canLaunchBall) {
@@ -131,9 +113,17 @@ class Game {
       BallPhysics.bounceOffPlayer(ball, player);
     }
 
+    for (const brick of bricks) {
+      if (CollisionDetector.hitBrick(ball, brick)) {
+        scoreManager.increaseScore(levelManager.currentLevel);
+        bricks.delete(brick);
+        BallPhysics.bounceOffBrick(ball);
+        break;
+      }
+    }
+
     Mover.movePlayer(player);
     Mover.moveBall(ball);
-    this.removeBrickIfHit();
     renderer.drawEntities({ ball, bricks, player });
     renderer.drawScores(scoreManager.scores);
     this.showGameStatus();

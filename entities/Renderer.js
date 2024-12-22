@@ -67,12 +67,8 @@ class Renderer {
   }
 
   drawBricks(bricks) {
-    for (let i = 0; i < bricks.length; i++) {
-      const brick = bricks[i];
-
-      if (brick.active) {
-        this.drawBrick(brick);
-      }
+    for (const brick of bricks) {
+      this.drawBrick(brick);
     }
   }
 

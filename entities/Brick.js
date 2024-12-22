@@ -4,7 +4,6 @@ class Brick {
   y;
   width;
   height;
-  active = true;
 
   constructor({ color, x, y, width, height }) {
     this.color = color;

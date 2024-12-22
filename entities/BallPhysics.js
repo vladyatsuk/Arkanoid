@@ -16,6 +16,10 @@ class BallPhysics {
     if (player.leftKeyPressed) ball.speedX = -BALL_SPEED_X;
     if (player.rightKeyPressed) ball.speedX = BALL_SPEED_X;
   }
+
+  static bounceOffBrick(ball) {
+    ball.speedY *= -1;
+  }
 }
 
 export default BallPhysics;
