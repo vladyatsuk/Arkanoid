@@ -228,7 +228,7 @@ class Game {
     player.move();
     ball.move();
     this.removeBrickIfHit();
-    renderer.drawFrame({ ball, bricks, player });
+    renderer.drawEntities({ ball, bricks, player });
     renderer.drawScores(this.score, this.bestScore);
     this.showGameStatus();
   }

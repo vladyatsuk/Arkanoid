@@ -10,24 +10,24 @@ const START_ANGLE = 0,
       FULL_CIRCLE = 2 * Math.PI;
 
 class Renderer {
-  ctx;
-  scoreLabel;
-  bestScoreLabel;
-  header;
+  #ctx;
+  #scoreLabel;
+  #bestScoreLabel;
+  #header;
 
   constructor(ctx, scoreLabel, bestScoreLabel, header) {
-    this.ctx = ctx;
-    this.scoreLabel = scoreLabel;
-    this.bestScoreLabel = bestScoreLabel;
-    this.header = header;
+    this.#ctx = ctx;
+    this.#scoreLabel = scoreLabel;
+    this.#bestScoreLabel = bestScoreLabel;
+    this.#header = header;
   }
 
   clearCanvas() {
-    this.ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
+    this.#ctx.clearRect(START_X, START_Y, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 
   drawBall(ball) {
-    const { ctx } = this;
+    const ctx = this.#ctx;
     ctx.save();
     ctx.fillStyle = ball.color;
     ctx.beginPath();
@@ -37,7 +37,7 @@ class Renderer {
   }
 
   drawPlayer(player) {
-    const { ctx } = this;
+    const ctx = this.#ctx;
     ctx.save();
     ctx.fillStyle = player.color;
     ctx.beginPath();
@@ -48,7 +48,7 @@ class Renderer {
   }
 
   drawBrick(brick) {
-    const { ctx } = this;
+    const ctx = this.#ctx;
     ctx.save();
     ctx.fillStyle = brick.color;
     ctx.beginPath();
@@ -68,7 +68,7 @@ class Renderer {
     }
   }
 
-  drawFrame({ ball, bricks, player }) {
+  drawEntities({ ball, bricks, player }) {
     this.clearCanvas();
     this.drawBall(ball);
     this.drawBricks(bricks);
@@ -76,11 +76,11 @@ class Renderer {
   }
 
   drawScore(score) {
-    this.scoreLabel.innerHTML = `Score: ${score}`;
+    this.#scoreLabel.innerHTML = `Score: ${score}`;
   }
 
   drawBestScore(bestScore) {
-    this.bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
+    this.#bestScoreLabel.innerHTML = `Best score: ${bestScore}`;
   }
 
   drawScores(score, bestScore) {
@@ -89,7 +89,7 @@ class Renderer {
   }
 
   drawHeader(message) {
-    this.header.innerHTML = message;
+    this.#header.innerHTML = message;
   }
 }
 
