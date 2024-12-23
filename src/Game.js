@@ -7,84 +7,91 @@ import {
   BALL_RIGHT_DIRECTION,
 } from './constants/ball.js';
 import { GAME_DELAY } from './constants/game.js';
-import { STATES } from './constants/gameState.js';
+import { PHASES } from './constants/gamePhase.js';
 import { COMMANDS } from './constants/commands.js';
 
-import Ball from './entities/Ball.js';
-import Player from './entities/Player.js';
 import PlayerEngine from './physics/PlayerEngine.js';
 import CollisionDetector from './physics/CollisionDetector.js';
 import Controls from './input/Controls.js';
 import BallEngine from './physics/BallEngine.js';
-import ScoreManager from './managers/ScoreManager.js';
-import LevelManager from './managers/LevelManager.js';
 import EntityFactory from './factories/EntityFactory.js';
-import GameState from './managers/GameState.js';
-import GameMessage from './ui/GameMessage.js';
+
+import GamePhaseState from './state/GamePhaseState.js';
+import LevelState from './state/LevelState.js';
+import ScoreState from './state/ScoreState.js';
+import UiState from './state/UiState.js';
+
+import GamePhaseManager from './managers/GamePhaseManager.js';
+import LevelManager from './managers/LevelManager.js';
+import ScoreManager from './managers/ScoreManager.js';
+import UiManager from './managers/UiManager.js';
 
 class Game {
-  #ball;
-  #player;
-  #bricks;
-  #scoreManager;
+  #levelState;
   #levelManager;
-  #gameState;
+  #scoreState;
+  #scoreManager;
+  #gamePhaseState;
+  #gamePhaseManager;
+  #uiState;
+  #uiManager;
+  #entities;
   #controls;
   #renderer;
-  #gameMessage;
 
-  constructor({
-    levelManager = new LevelManager(),
-    scoreManager = new ScoreManager(),
-    gameState = new GameState(),
-    ball = new Ball(),
-    player = new Player(),
-    gameMessage = new GameMessage(),
-    controls = new Controls(),
-    renderer,
-  }) {
-    this.#ball = ball;
-    this.#player = player;
-    this.#scoreManager = scoreManager;
-    this.#levelManager = levelManager;
-    this.#gameState = gameState;
-    this.#controls = controls;
+  constructor(renderer) {
     this.#renderer = renderer;
-    this.#gameMessage = gameMessage;
 
-    this.#gameMessage.set('Press \'s\' to play!');
-    this.#createLevel();
+    this.#uiState = new UiState();
+    this.#levelState = new LevelState();
+    this.#scoreState = new ScoreState();
+    this.#gamePhaseState = new GamePhaseState();
+
+    this.#uiManager = new UiManager({
+      scoreState: this.#scoreState,
+      levelState: this.#levelState,
+      gamePhaseState: this.#gamePhaseState,
+      uiState: this.#uiState,
+    });
+    this.#gamePhaseManager = new GamePhaseManager(this.#gamePhaseState);
+    this.#scoreManager = new ScoreManager(this.#scoreState);
+    this.#levelManager = new LevelManager(this.#levelState);
+
+    this.#entities = EntityFactory
+      .createEntities(this.#levelState.levelStructure);
+    this.#controls = new Controls();
+
+    this.#resetPositions();
   }
 
   get #isLoss() {
-    const ball = this.#ball,
-          player = this.#player;
+    const { ball, player } = this.#entities;
 
     return ball.top > player.bottom;
   }
 
   #handleWaiting() {
-    const ball = this.#ball,
-          gameState = this.#gameState,
+    const { ball } = this.#entities;
+
+    const gamePhaseManager = this.#gamePhaseManager,
           controls = this.#controls;
 
     if (controls.isActive(COMMANDS.LAUNCH_BALL)) {
       BallEngine.launch(ball);
-      gameState.transition(STATES.PLAYING);
+      gamePhaseManager.transition(PHASES.PLAYING);
     }
   }
 
   #handlePlaying() {
-    const ball = this.#ball,
-          player = this.#player,
-          bricks = this.#bricks,
-          scoreManager = this.#scoreManager,
-          levelManager = this.#levelManager,
-          gameState = this.#gameState,
-          controls = this.#controls,
-          gameMessage = this.#gameMessage;
+    const { ball, player, bricks } = this.#entities;
 
-    gameMessage.set('Break all the bricks!');
+    const scoreManager = this.#scoreManager,
+          gamePhaseManager = this.#gamePhaseManager,
+          uiManager = this.#uiManager,
+          levelState = this.#levelState,
+          controls = this.#controls;
+
+    uiManager.updateGameMessage();
 
     if (CollisionDetector.hitCeiling(ball)) {
       BallEngine.reverseSpeedY(ball);
@@ -108,8 +115,8 @@ class Game {
 
     for (const brick of bricks) {
       if (CollisionDetector.hitBrick(ball, brick)) {
-        scoreManager.increaseScore(levelManager.currentLevel);
-        scoreManager.updateBestScore();
+        scoreManager.increaseScore(levelState.levelNumber);
+        uiManager.updateScores();
         bricks.delete(brick);
         BallEngine.reverseSpeedY(ball);
         break;
@@ -127,89 +134,88 @@ class Game {
     BallEngine.move(ball);
 
     if (!bricks.size) {
-      gameState.transition(STATES.LEVEL_DONE);
+      gamePhaseManager.transition(PHASES.LEVEL_DONE);
     } else if (this.#isLoss) {
-      gameState.transition(STATES.LOST);
+      gamePhaseManager.transition(PHASES.LOST);
     }
   }
 
   #handleLevelDone() {
-    const scoreManager = this.#scoreManager,
+    const uiManager = this.#uiManager,
           levelManager = this.#levelManager,
-          gameState = this.#gameState,
-          gameMessage = this.#gameMessage;
+          gamePhaseManager = this.#gamePhaseManager,
+          levelState = this.#levelState;
 
-    gameMessage.set(`You won level ${levelManager.currentLevel} :)`);
-    scoreManager.resetScore();
+    uiManager.updateGameMessage();
+
     levelManager.incrementLevelIndex();
 
-    if (levelManager.isLastLevel) {
-      gameMessage.set('You won the last level :)');
+    if (levelState.isLastLevel) {
+      uiManager.updateGameMessage();
       levelManager.resetLevelIndex();
     }
 
     this.#createLevel();
-    gameState.transition(STATES.WAITING);
+    gamePhaseManager.transition(PHASES.WAITING);
   }
 
   #handleLost() {
-    const levelManager = this.#levelManager,
-          gameState = this.#gameState,
-          gameMessage = this.#gameMessage;
+    const uiManager = this.#uiManager,
+          levelManager = this.#levelManager,
+          scoreManager = this.#scoreManager,
+          gamePhaseManager = this.#gamePhaseManager;
 
     levelManager.resetLevelIndex();
-    gameMessage.set('You lost :(');
+    uiManager.updateGameMessage();
+    scoreManager.resetScore();
+    uiManager.updateScores();
     this.#createLevel();
-    gameState.transition(STATES.WAITING);
+    gamePhaseManager.transition(PHASES.WAITING);
+  }
+
+  #resetPositions() {
+    const entities = this.#entities;
+
+    BallEngine.stop(entities.ball);
+    BallEngine.resetPosition(entities.ball);
+    PlayerEngine.resetPosition(entities.player);
   }
 
   #createLevel() {
-    const ball = this.#ball,
-          player = this.#player,
-          scoreManager = this.#scoreManager,
-          levelManager = this.#levelManager;
+    const entities = this.#entities,
+          levelState = this.#levelState;
 
-    scoreManager.resetScore();
-    BallEngine.stop(ball);
-    BallEngine.resetPosition(ball);
-    PlayerEngine.resetPosition(player);
-    this.#bricks = EntityFactory.createBricks(levelManager.levelStructure);
+    this.#resetPositions();
+    entities.bricks = EntityFactory.createBricks(levelState.levelStructure);
   }
 
   #loop() {
     const renderer = this.#renderer,
-          ball = this.#ball,
-          player = this.#player,
-          bricks = this.#bricks,
-          scoreManager = this.#scoreManager,
-          gameState = this.#gameState,
-          gameMessage = this.#gameMessage;
+          gamePhaseState = this.#gamePhaseState,
+          uiState = this.#uiState,
+          entities = this.#entities;
 
     const handler = {
-      [STATES.WAITING]: () => {
+      [PHASES.WAITING]: () => {
         this.#handleWaiting();
       },
-      [STATES.PLAYING]: () => {
+      [PHASES.PLAYING]: () => {
         this.#handlePlaying();
       },
-      [STATES.LEVEL_DONE]: () => {
+      [PHASES.LEVEL_DONE]: () => {
         this.#handleLevelDone();
       },
-      [STATES.LOST]: () => {
+      [PHASES.LOST]: () => {
         this.#handleLost();
       },
-    }[gameState.state];
+    }[gamePhaseState.phase];
 
     if (!handler) {
-      throw new Error(`Unhandled state: ${gameState.state}`);
+      throw new Error(`Unhandled state: ${gamePhaseState.phase}`);
     }
 
     handler();
-    renderer.drawFrame(
-      { ball, bricks, player },
-      scoreManager.scores,
-      gameMessage.value,
-    );
+    renderer.drawFrame(entities, uiState);
   }
 
   start() {

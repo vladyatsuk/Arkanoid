@@ -27,7 +27,7 @@ const main = () => {
     gameMessageElement,
   });
 
-  const game = new Game({ renderer });
+  const game = new Game(renderer);
 
   game.start();
 };

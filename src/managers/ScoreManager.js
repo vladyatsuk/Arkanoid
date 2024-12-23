@@ -1,25 +1,30 @@
-import { START_CURRENT, START_BEST, BASE_REWARD } from '../constants/score.js';
+import { BASE_REWARD } from '../constants/score.js';
 
 class ScoreManager {
-  #current = START_CURRENT;
-  #best = START_BEST;
+  #scoreState;
 
-  get scores() {
-    return { current: this.#current, best: this.#best };
+  constructor(scoreState) {
+    this.#scoreState = scoreState;
+  }
+
+  #updateBestScore() {
+    const scoreState = this.#scoreState;
+    const { currentScore, bestScore } = scoreState;
+
+    if (currentScore > bestScore) {
+      scoreState.bestScore = currentScore;
+    }
   }
 
   resetScore() {
-    this.#current = 0;
+    this.#scoreState.currentScore = 0;
   }
 
   increaseScore(levelNumber) {
-    this.#current += BASE_REWARD * levelNumber;
-  }
+    const scoreState = this.#scoreState;
 
-  updateBestScore() {
-    const { current, best } = this.scores;
-
-    if (current > best) this.#best = current;
+    scoreState.currentScore += BASE_REWARD * levelNumber;
+    this.#updateBestScore();
   }
 }
 

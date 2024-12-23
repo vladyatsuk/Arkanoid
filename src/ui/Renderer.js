@@ -87,19 +87,20 @@ class Renderer {
     this.#bestScoreElement.textContent = `${bestScore}`;
   }
 
-  drawScores({ current, best }) {
-    this.drawScore(current);
-    this.drawBestScore(best);
+  drawScores({ currentScore, bestScore }) {
+    this.drawScore(currentScore);
+    this.drawBestScore(bestScore);
   }
 
   drawGameMessage(message) {
     this.#gameMessageElement.textContent = message;
   }
 
-  drawFrame(entities, scores, message) {
+  drawFrame(entities, ui) {
+    const { currentScore, bestScore, gameMessage } = ui;
     this.drawEntities(entities);
-    this.drawScores(scores);
-    this.drawGameMessage(message);
+    this.drawScores({ currentScore, bestScore });
+    this.drawGameMessage(gameMessage);
   }
 }
 
