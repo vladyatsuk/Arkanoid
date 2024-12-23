@@ -1,31 +1,26 @@
 import { PHASES } from '../constants/gamePhase.js';
 
 class UiManager {
-  #scoreState;
-  #levelState;
-  #gamePhaseState;
+  #gameLogicState;
   #uiState;
 
-  constructor({ scoreState, levelState, gamePhaseState, uiState }) {
-    this.#scoreState = scoreState;
-    this.#levelState = levelState;
-    this.#gamePhaseState = gamePhaseState;
+  constructor({ gameLogicState, uiState }) {
+    this.#gameLogicState = gameLogicState;
     this.#uiState = uiState;
     this.updateScores();
   }
 
   updateScores() {
     const uiState = this.#uiState;
-    const { currentScore, bestScore } = this.#scoreState;
+    const { currentScore, bestScore } = this.#gameLogicState.scoreState;
 
     uiState.currentScore = `${currentScore}`;
     uiState.bestScore = `${bestScore}`;
   }
 
   updateGameMessage() {
-    const gamePhaseState = this.#gamePhaseState,
-          levelState = this.#levelState,
-          uiState = this.#uiState;
+    const { gamePhaseState, levelState } = this.#gameLogicState;
+    const uiState = this.#uiState;
 
     const messageMap = {
       [PHASES.PLAYING]: () => 'Break all the bricks!',
