@@ -1,27 +1,17 @@
-import { CANVAS_CENTER_X } from '../constants/canvas.js';
-import {
-  BALL_START_Y,
-  BALL_COLOR as COLOR,
-  BALL_RADIUS as RADIUS,
-} from '../constants/ball.js';
-
 class Ball {
   x;
   y;
   r;
-  speedX = 0;
-  speedY = 0;
+  speedX;
+  speedY;
   color;
 
-  constructor({
-    x = CANVAS_CENTER_X,
-    y = BALL_START_Y,
-    r = RADIUS,
-    color = COLOR,
-  } = {}) {
+  constructor({ x, y, r, speedX, speedY, color }) {
     this.x = x;
     this.y = y;
     this.r = r;
+    this.speedX = speedX;
+    this.speedY = speedY;
     this.color = color;
   }
 

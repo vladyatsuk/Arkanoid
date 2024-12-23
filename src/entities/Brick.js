@@ -1,16 +1,16 @@
 class Brick {
-  color;
   x;
   y;
   width;
   height;
+  color;
 
-  constructor({ color, x, y, width, height }) {
-    this.color = color;
+  constructor({ x, y, width, height, color }) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+    this.color = color;
   }
 
   get top() {
