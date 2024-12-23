@@ -1,30 +1,39 @@
-import { BALL_BOOST, BALL_SPEED_X } from '../constants/ball.js';
-import Controls from './Controls.js';
+import { BALL_SPEED_X, BALL_SPEED_Y, BALL_START_Y } from '../constants/ball.js';
+import { CANVAS_RIGHT } from '../constants/canvas.js';
+import { GAME_INDENT } from '../constants/game.js';
 
 class BallEngine {
+  static launch(ball) {
+    ball.speedX = BALL_SPEED_X;
+    ball.speedY = BALL_SPEED_Y;
+  }
+
+  static stop(ball) {
+    ball.speedX = 0;
+    ball.speedY = 0;
+  }
+
   static move(ball) {
     ball.x += ball.speedX;
     ball.y += ball.speedY;
   }
 
-  static bounceOffCeiling(ball) {
+  static reverseSpeedY(ball) {
     ball.speedY *= -1;
-    ball.y += BALL_BOOST;
   }
 
-  static bounceOffWalls(ball) {
+  static reverseSpeedX(ball) {
     ball.speedX *= -1;
   }
 
-  static bounceOffPlayer(ball) {
-    ball.speedY *= -1;
-    ball.y -= BALL_BOOST;
-    if (Controls.leftKey) ball.speedX = -BALL_SPEED_X;
-    if (Controls.rightKey) ball.speedX = BALL_SPEED_X;
+  static bounceX(ball, direction) {
+    ball.speedX = direction * Math.abs(ball.speedX);
   }
 
-  static bounceOffBrick(ball) {
-    ball.speedY *= -1;
+  static resetPosition(ball) {
+    // eslint-disable-next-line no-magic-numbers
+    ball.x = Math.random() * (CANVAS_RIGHT - 2 * GAME_INDENT) + GAME_INDENT;
+    ball.y = BALL_START_Y;
   }
 }
 

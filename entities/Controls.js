@@ -1,54 +1,44 @@
-import { BALL_SPEED_X, BALL_SPEED_Y } from '../constants/ball.js';
-import { STATES } from '../constants/gameState.js';
+import { COMMANDS, COMMANDS_TO_CODES } from '../constants/commands.js';
 
 class Controls {
-  static leftKey = false;
-  static rightKey = false;
+  #commandStates = Object.keys(COMMANDS)
+    .reduce((states, command) => {
+      states[command] = false;
 
-  static #handleKeyDown(event) {
-    const { code } = event;
+      return states;
+    }, {});
 
-    if (code === 'KeyA' || code === 'ArrowLeft') {
-      this.leftKey = true;
-    }
-
-    if (code === 'KeyD' || code === 'ArrowRight') {
-      this.rightKey = true;
-    }
+  constructor() {
+    this.#setupEventListeners();
   }
 
-  static #handleKeyUp(event) {
-    const { code } = event;
-
-    if (code === 'KeyA' || code === 'ArrowLeft') {
-      this.leftKey = false;
-    }
-
-    if (code === 'KeyD' || code === 'ArrowRight') {
-      this.rightKey = false;
-    }
-  }
-
-  static #handleGameStartOnKeys(event, ball, gameState) {
-    const { code } = event;
-
-    if (code === 'KeyS' || code === 'ArrowDown') {
-      if (gameState.state === STATES.WAITING) {
-        ball.speedX = BALL_SPEED_X;
-        ball.speedY = BALL_SPEED_Y;
-        gameState.transition(STATES.PLAYING);
+  #set(code, isActive) {
+    for (const [command, codes] of Object.entries(COMMANDS_TO_CODES)) {
+      if (codes.has(code)) {
+        this.#commandStates[command] = isActive;
       }
     }
   }
 
-  static setControls(ball, gameState) {
+  #handleKeyDown(event) {
+    this.#set(event.code, true);
+  }
+
+  #handleKeyUp(event) {
+    this.#set(event.code, false);
+  }
+
+  #setupEventListeners() {
     document.addEventListener('keydown', (event) => {
       this.#handleKeyDown(event);
-      this.#handleGameStartOnKeys(event, ball, gameState);
     });
     document.addEventListener('keyup', (event) => {
       this.#handleKeyUp(event);
     });
+  }
+
+  isActive(command) {
+    return this.#commandStates[command];
   }
 }
 

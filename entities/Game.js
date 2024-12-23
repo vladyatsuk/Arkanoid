@@ -1,8 +1,14 @@
-import { CANVAS_RIGHT } from '../constants/canvas.js';
-import { BALL_START_Y } from '../constants/ball.js';
-import { PLAYER_START_X } from '../constants/player.js';
-import { GAME_INDENT, GAME_DELAY } from '../constants/game.js';
+import {
+  PLAYER_LEFT_DIRECTION,
+  PLAYER_RIGHT_DIRECTION,
+} from '../constants/player.js';
+import {
+  BALL_LEFT_DIRECTION,
+  BALL_RIGHT_DIRECTION,
+} from '../constants/ball.js';
+import { GAME_DELAY } from '../constants/game.js';
 import { STATES } from '../constants/gameState.js';
+import { COMMANDS } from '../constants/commands.js';
 
 import Ball from './Ball.js';
 import Player from './Player.js';
@@ -17,12 +23,13 @@ import GameState from './GameState.js';
 import GameMessage from './GameMessage.js';
 
 class Game {
-  #levelManager;
-  #scoreManager;
-  #gameState;
   #ball;
   #player;
   #bricks;
+  #scoreManager;
+  #levelManager;
+  #gameState;
+  #controls;
   #renderer;
   #gameMessage;
 
@@ -35,15 +42,16 @@ class Game {
     gameMessage = new GameMessage(),
     renderer,
   }) {
-    this.#levelManager = levelManager;
-    this.#scoreManager = scoreManager;
-    this.#gameState = gameState;
     this.#ball = ball;
     this.#player = player;
-    this.#gameMessage = gameMessage;
+    this.#scoreManager = scoreManager;
+    this.#levelManager = levelManager;
+    this.#gameState = gameState;
+    this.#controls = new Controls();
     this.#renderer = renderer;
+    this.#gameMessage = gameMessage;
+
     this.#gameMessage.set('Press \'s\' to play!');
-    Controls.setControls(ball, this.#gameState);
     this.#createLevel();
   }
 
@@ -55,9 +63,14 @@ class Game {
   }
 
   #handleWaiting() {
-    const player = this.#player;
+    const ball = this.#ball,
+          gameState = this.#gameState,
+          controls = this.#controls;
 
-    player.x = PLAYER_START_X;
+    if (controls.isActive(COMMANDS.LAUNCH_BALL)) {
+      BallEngine.launch(ball);
+      gameState.transition(STATES.PLAYING);
+    }
   }
 
   #handlePlaying() {
@@ -65,20 +78,31 @@ class Game {
           player = this.#player,
           bricks = this.#bricks,
           scoreManager = this.#scoreManager,
-          levelManager = this.#levelManager;
+          levelManager = this.#levelManager,
+          gameState = this.#gameState,
+          controls = this.#controls,
+          gameMessage = this.#gameMessage;
 
-    this.#gameMessage.set('Break all the bricks!');
+    gameMessage.set('Break all the bricks!');
 
     if (CollisionDetector.hitCeiling(ball)) {
-      BallEngine.bounceOffCeiling(ball);
+      BallEngine.reverseSpeedY(ball);
     }
 
     if (CollisionDetector.hitWalls(ball)) {
-      BallEngine.bounceOffWalls(ball);
+      BallEngine.reverseSpeedX(ball);
     }
 
     if (CollisionDetector.hitPlayer(ball, player)) {
-      BallEngine.bounceOffPlayer(ball);
+      if (controls.isActive(COMMANDS.MOVE_LEFT)) {
+        BallEngine.bounceX(ball, BALL_LEFT_DIRECTION);
+      }
+
+      if (controls.isActive(COMMANDS.MOVE_RIGHT)) {
+        BallEngine.bounceX(ball, BALL_RIGHT_DIRECTION);
+      }
+
+      BallEngine.reverseSpeedY(ball);
     }
 
     for (const brick of bricks) {
@@ -86,44 +110,56 @@ class Game {
         scoreManager.increaseScore(levelManager.currentLevel);
         scoreManager.updateBestScore();
         bricks.delete(brick);
-        BallEngine.bounceOffBrick(ball);
+        BallEngine.reverseSpeedY(ball);
         break;
       }
     }
 
-    PlayerEngine.move(player);
+    if (controls.isActive(COMMANDS.MOVE_LEFT)) {
+      PlayerEngine.move(player, PLAYER_LEFT_DIRECTION);
+    }
+
+    if (controls.isActive(COMMANDS.MOVE_RIGHT)) {
+      PlayerEngine.move(player, PLAYER_RIGHT_DIRECTION);
+    }
+
     BallEngine.move(ball);
+
     if (!bricks.size) {
-      this.#gameState.transition(STATES.LEVEL_DONE);
+      gameState.transition(STATES.LEVEL_DONE);
     } else if (this.#isLoss) {
-      this.#gameState.transition(STATES.LOST);
+      gameState.transition(STATES.LOST);
     }
   }
 
   #handleLevelDone() {
     const scoreManager = this.#scoreManager,
-          levelManager = this.#levelManager;
+          levelManager = this.#levelManager,
+          gameState = this.#gameState,
+          gameMessage = this.#gameMessage;
 
-    this.#gameMessage.set(`You won level ${levelManager.currentLevel} :)`);
+    gameMessage.set(`You won level ${levelManager.currentLevel} :)`);
     scoreManager.resetScore();
     levelManager.incrementLevelIndex();
 
     if (levelManager.isLastLevel) {
-      this.#gameMessage.set('You won the last level :)');
+      gameMessage.set('You won the last level :)');
       levelManager.resetLevelIndex();
     }
 
     this.#createLevel();
-    this.#gameState.transition(STATES.WAITING);
+    gameState.transition(STATES.WAITING);
   }
 
   #handleLost() {
-    const levelManager = this.#levelManager;
+    const levelManager = this.#levelManager,
+          gameState = this.#gameState,
+          gameMessage = this.#gameMessage;
 
     levelManager.resetLevelIndex();
-    this.#gameMessage.set('You lost :(');
+    gameMessage.set('You lost :(');
     this.#createLevel();
-    this.#gameState.transition(STATES.WAITING);
+    gameState.transition(STATES.WAITING);
   }
 
   #createLevel() {
@@ -133,11 +169,9 @@ class Game {
           levelManager = this.#levelManager;
 
     scoreManager.resetScore();
-    ball.speedX = 0;
-    ball.speedY = 0;
-    player.x = PLAYER_START_X;
-    ball.x = Game.generateRandomPosition();
-    ball.y = BALL_START_Y;
+    BallEngine.stop(ball);
+    BallEngine.resetPosition(ball);
+    PlayerEngine.resetPosition(player);
     this.#bricks = EntityFactory.createBricks(levelManager.levelStructure);
   }
 
@@ -146,7 +180,9 @@ class Game {
           ball = this.#ball,
           player = this.#player,
           bricks = this.#bricks,
-          scoreManager = this.#scoreManager;
+          scoreManager = this.#scoreManager,
+          gameState = this.#gameState,
+          gameMessage = this.#gameMessage;
 
     const handler = {
       [STATES.WAITING]: () => {
@@ -161,25 +197,22 @@ class Game {
       [STATES.LOST]: () => {
         this.#handleLost();
       },
-    }[this.#gameState.state];
+    }[gameState.state];
 
     if (!handler) {
-      throw new Error(`Unhandled state: ${this.#gameState.state}`);
+      throw new Error(`Unhandled state: ${gameState.state}`);
     }
 
     handler();
-    renderer.drawEntities({ ball, bricks, player });
-    renderer.drawScores(scoreManager.scores);
-    renderer.drawGameMessage(this.#gameMessage.value);
+    renderer.drawFrame(
+      { ball, bricks, player },
+      scoreManager.scores,
+      gameMessage.value,
+    );
   }
 
   start() {
     setInterval(() => this.#loop(), GAME_DELAY);
-  }
-
-  static generateRandomPosition() {
-    // eslint-disable-next-line no-magic-numbers
-    return Math.random() * (CANVAS_RIGHT - 2 * GAME_INDENT) + GAME_INDENT;
   }
 }
 

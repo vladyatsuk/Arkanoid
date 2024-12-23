@@ -95,6 +95,12 @@ class Renderer {
   drawGameMessage(message) {
     this.#gameMessageElement.textContent = message;
   }
+
+  drawFrame(entities, scores, message) {
+    this.drawEntities(entities);
+    this.drawScores(scores);
+    this.drawGameMessage(message);
+  }
 }
 
 export default Renderer;

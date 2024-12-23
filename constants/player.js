@@ -9,3 +9,5 @@ export const PLAYER_START_X = CANVAS_CENTER_X + PLAYER_X_OFFSET;
 export const PLAYER_START_Y = CANVAS_BOTTOM + PLAYER_Y_OFFSET;
 export const PLAYER_SPEED = 1.5;
 export const PLAYER_COLOR = 'red';
+export const PLAYER_RIGHT_DIRECTION = 1;
+export const PLAYER_LEFT_DIRECTION = -1;

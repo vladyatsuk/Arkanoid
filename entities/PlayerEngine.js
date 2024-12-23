@@ -1,15 +1,19 @@
 import { CANVAS_LEFT, CANVAS_RIGHT } from '../constants/canvas.js';
-import Controls from './Controls.js';
+import { PLAYER_START_X } from '../constants/player.js';
 
 class PlayerEngine {
-  static move(player) {
-    if (Controls.leftKey) {
-      player.x = Math.max(CANVAS_LEFT, player.x - player.speed);
-    }
+  static move(player, direction) {
+    player.x = Math.max(
+      CANVAS_LEFT,
+      Math.min(
+        CANVAS_RIGHT - player.width,
+        player.x + direction * player.speed,
+      ),
+    );
+  }
 
-    if (Controls.rightKey) {
-      player.x = Math.min(CANVAS_RIGHT - player.width, player.x + player.speed);
-    }
+  static resetPosition(player) {
+    player.x = PLAYER_START_X;
   }
 }
 
