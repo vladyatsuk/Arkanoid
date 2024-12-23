@@ -1,26 +1,26 @@
 import {
   PLAYER_LEFT_DIRECTION,
   PLAYER_RIGHT_DIRECTION,
-} from '../constants/player.js';
+} from './constants/player.js';
 import {
   BALL_LEFT_DIRECTION,
   BALL_RIGHT_DIRECTION,
-} from '../constants/ball.js';
-import { GAME_DELAY } from '../constants/game.js';
-import { STATES } from '../constants/gameState.js';
-import { COMMANDS } from '../constants/commands.js';
+} from './constants/ball.js';
+import { GAME_DELAY } from './constants/game.js';
+import { STATES } from './constants/gameState.js';
+import { COMMANDS } from './constants/commands.js';
 
-import Ball from './Ball.js';
-import Player from './Player.js';
-import PlayerEngine from './PlayerEngine.js';
-import CollisionDetector from './CollisionDetector.js';
-import Controls from './Controls.js';
-import BallEngine from './BallEngine.js';
-import ScoreManager from './ScoreManager.js';
-import LevelManager from './LevelManager.js';
-import EntityFactory from './EntityFactory.js';
-import GameState from './GameState.js';
-import GameMessage from './GameMessage.js';
+import Ball from './entities/Ball.js';
+import Player from './entities/Player.js';
+import PlayerEngine from './physics/PlayerEngine.js';
+import CollisionDetector from './physics/CollisionDetector.js';
+import Controls from './input/Controls.js';
+import BallEngine from './physics/BallEngine.js';
+import ScoreManager from './managers/ScoreManager.js';
+import LevelManager from './managers/LevelManager.js';
+import EntityFactory from './factories/EntityFactory.js';
+import GameState from './managers/GameState.js';
+import GameMessage from './ui/GameMessage.js';
 
 class Game {
   #ball;
@@ -40,6 +40,7 @@ class Game {
     ball = new Ball(),
     player = new Player(),
     gameMessage = new GameMessage(),
+    controls = new Controls(),
     renderer,
   }) {
     this.#ball = ball;
@@ -47,7 +48,7 @@ class Game {
     this.#scoreManager = scoreManager;
     this.#levelManager = levelManager;
     this.#gameState = gameState;
-    this.#controls = new Controls();
+    this.#controls = controls;
     this.#renderer = renderer;
     this.#gameMessage = gameMessage;
 

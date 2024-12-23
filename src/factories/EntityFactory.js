@@ -5,7 +5,7 @@ import {
   BRICK_Y_OFFSET,
 } from '../constants/brick.js';
 import { GAME_COLORS } from '../constants/game.js';
-import Brick from './Brick.js';
+import Brick from '../entities/Brick.js';
 
 class EntityFactory {
   static createBricks(level) {

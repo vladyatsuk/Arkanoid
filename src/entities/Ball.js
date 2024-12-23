@@ -6,23 +6,23 @@ import {
 } from '../constants/ball.js';
 
 class Ball {
-  color;
   x;
   y;
   r;
   speedX = 0;
   speedY = 0;
+  color;
 
   constructor({
-    color = COLOR,
     x = CANVAS_CENTER_X,
     y = BALL_START_Y,
     r = RADIUS,
+    color = COLOR,
   } = {}) {
-    this.color = color;
     this.x = x;
     this.y = y;
     this.r = r;
+    this.color = color;
   }
 
   get top() {
